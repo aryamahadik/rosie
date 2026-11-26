@@ -1,0 +1,934 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.14.schema.json",
+  "title": "ToolApiV1dot14",
+  "description": "K-09 Tool API v1.14, a minor version that only adds (T-1547; the sign-up remainder ruling T-1543, its card A7, ops/reviews/signup-remainder/rule-rest.json; DL-1194; README 'v1.14'): gateAndCommit takes a fourth input beside decided, clock and coreOnly, an event (gateAndCommit.event: kind event, its eventId, its key from the event table, the step that waits for it, the ref of the key's own source, and the handle's phone service and zone), which a page call or staging's team decision hands to the person's own chat handle actor and the actor runs as a turn of its own: no texts, so no guard, frontier, decide or core action, and no Linq chat id; its turn id is the event id's hash, so a repeat answers repeated (README v1.14 defaults 221 and 222). The event table gains control_proven beside id_checked (default 223). Waiting is read from the key's own source, and an event its source does not have waiting is answered with the new error eventNotWaiting, nothing written (default 224; eventNotWaitingError). The resume, the event turn's walk start and writer lane, the walk's text-path rules, the park and the reply are README defaults 225 to 231. A fixture of an event turn states its source (gateAndCommit.given.eventSource, never sent; default 232), which the named rule eventTurn reads. Every v1.13 definition (tool-api.v1.13.schema.json, frozen by T-1539 and unchanged, referred to here, which refers to v1.12 and down to v1) is here under its own name, each by reference, but gateAndCommit.request, gateAndCommit.errors, gateAndCommit.given and gateAndCommit.exchange, which v1.14 restates so each takes every earlier value and the event more; so every v1 to v1.13 exchange is a v1.14 exchange and a consumer on v1.13 keeps working. Added: the definitions gateAndCommit.event, eventKey, eventSource and eventNotWaitingError; no call, so callName is v1.13's. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/buildFrontier.exchange" },
+    { "$ref": "#/$defs/closestEntries.exchange" },
+    { "$ref": "#/$defs/gateAndCommit.exchange" },
+    { "$ref": "#/$defs/composeInput.exchange" },
+    { "$ref": "#/$defs/finalizeMessage.exchange" },
+    { "$ref": "#/$defs/recordSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/releaseSafetyHold.exchange" },
+    { "$ref": "#/$defs/recordStopOrStart.exchange" },
+    { "$ref": "#/$defs/setRecordFlag.exchange" },
+    { "$ref": "#/$defs/handOff.exchange" },
+    { "$ref": "#/$defs/answerHandOff.exchange" },
+    { "$ref": "#/$defs/pageTeam.exchange" },
+    { "$ref": "#/$defs/acknowledgePage.exchange" },
+    { "$ref": "#/$defs/openReviewItem.exchange" },
+    { "$ref": "#/$defs/decideReviewItem.exchange" },
+    { "$ref": "#/$defs/enterDoor.exchange" },
+    { "$ref": "#/$defs/sendFixedLine.exchange" },
+    { "$ref": "#/$defs/sendsFailing.exchange" },
+    { "$ref": "#/$defs/textingBack.exchange" },
+    { "$ref": "#/$defs/calendarLinkDropped.exchange" },
+    { "$ref": "#/$defs/calendarLinkBack.exchange" },
+    { "$ref": "#/$defs/sendProofCode.exchange" },
+    { "$ref": "#/$defs/proveCode.exchange" },
+    { "$ref": "#/$defs/issueChatLink.exchange" },
+    { "$ref": "#/$defs/matchKinds.exchange" },
+    { "$ref": "#/$defs/lookupListing.exchange" },
+    { "$ref": "#/$defs/saveSetupStep.exchange" },
+    { "$ref": "#/$defs/readSetup.exchange" },
+    { "$ref": "#/$defs/openRequest.exchange" },
+    { "$ref": "#/$defs/confirmBusinessBooking.exchange" },
+    { "$ref": "#/$defs/readBackBusinessBooking.exchange" },
+    { "$ref": "#/$defs/findCustomer.exchange" },
+    { "$ref": "#/$defs/checkBookingFirst.exchange" },
+    { "$ref": "#/$defs/setCustomerBlock.exchange" },
+    { "$ref": "#/$defs/matchService.exchange" },
+    { "$ref": "#/$defs/setWhoFor.exchange" },
+    { "$ref": "#/$defs/setReachWay.exchange" },
+    { "$ref": "#/$defs/addCustomer.exchange" },
+    { "$ref": "#/$defs/setPrice.exchange" },
+    { "$ref": "#/$defs/quoteFromPhotos.exchange" },
+    { "$ref": "#/$defs/showTimes.exchange" },
+    { "$ref": "#/$defs/saveTime.exchange" },
+    { "$ref": "#/$defs/extendTime.exchange" },
+    { "$ref": "#/$defs/joinWaitlist.exchange" },
+    { "$ref": "#/$defs/sendSecureLink.exchange" },
+    { "$ref": "#/$defs/checkPlace.exchange" },
+    { "$ref": "#/$defs/saveSecurePage.exchange" },
+    { "$ref": "#/$defs/showMoneyBefore.exchange" },
+    { "$ref": "#/$defs/settleOffer.exchange" },
+    { "$ref": "#/$defs/signDocument.exchange" },
+    { "$ref": "#/$defs/takeMoneyBefore.exchange" },
+    { "$ref": "#/$defs/refundAtOnce.exchange" },
+    { "$ref": "#/$defs/askOwnerFirst.exchange" },
+    { "$ref": "#/$defs/sendToOnCall.exchange" },
+    { "$ref": "#/$defs/writeBooking.exchange" },
+    { "$ref": "#/$defs/recordStaffTold.exchange" },
+    { "$ref": "#/$defs/askAboutClash.exchange" },
+    { "$ref": "#/$defs/remindBeforeVisit.exchange" },
+    { "$ref": "#/$defs/moveBooking.exchange" },
+    { "$ref": "#/$defs/cancelBooking.exchange" },
+    { "$ref": "#/$defs/feeDoor.exchange" },
+    { "$ref": "#/$defs/proCantCome.exchange" },
+    { "$ref": "#/$defs/proRunsLate.exchange" },
+    { "$ref": "#/$defs/ownerChangesIt.exchange" },
+    { "$ref": "#/$defs/classTooFew.exchange" },
+    { "$ref": "#/$defs/changeWhatsBooked.exchange" },
+    { "$ref": "#/$defs/customerRunsLate.exchange" },
+    { "$ref": "#/$defs/changePlan.exchange" },
+    { "$ref": "#/$defs/finalCount.exchange" },
+    { "$ref": "#/$defs/firstStepsDue.exchange" },
+    { "$ref": "#/$defs/relayQuestion.exchange" },
+    { "$ref": "#/$defs/moveUpdates.exchange" },
+    { "$ref": "#/$defs/passOnNote.exchange" },
+    { "$ref": "#/$defs/someoneElseAsks.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "tool-api.v1.13.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "tool-api.v1.13.schema.json#/$defs/nullableId" },
+    "turnId": { "$ref": "tool-api.v1.13.schema.json#/$defs/turnId" },
+    "utc": { "$ref": "tool-api.v1.13.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "tool-api.v1.13.schema.json#/$defs/nullableUtc" },
+    "stepId": { "$ref": "tool-api.v1.13.schema.json#/$defs/stepId" },
+    "fixedLineId": { "$ref": "tool-api.v1.13.schema.json#/$defs/fixedLineId" },
+    "phoneNumber": { "$ref": "tool-api.v1.13.schema.json#/$defs/phoneNumber" },
+    "rowRef": { "$ref": "tool-api.v1.13.schema.json#/$defs/rowRef" },
+    "tableName": { "$ref": "tool-api.v1.13.schema.json#/$defs/tableName" },
+    "version": { "$ref": "tool-api.v1.13.schema.json#/$defs/version" },
+    "caller": { "$ref": "tool-api.v1.13.schema.json#/$defs/caller" },
+    "sentByActor": { "$ref": "tool-api.v1.13.schema.json#/$defs/sentByActor" },
+    "notFoundError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notFoundError" },
+    "transientError": { "$ref": "tool-api.v1.13.schema.json#/$defs/transientError" },
+    "constraintError": { "$ref": "tool-api.v1.13.schema.json#/$defs/constraintError" },
+    "versionChangedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/versionChangedError" },
+    "notAllowedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notAllowedError" },
+    "bookingPausedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/bookingPausedError" },
+    "turnParkedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/turnParkedError" },
+    "gateOutcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/gateOutcome" },
+    "limit1Outcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/limit1Outcome" },
+    "limit2Outcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/limit2Outcome" },
+    "limit3Outcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/limit3Outcome" },
+    "limit4Outcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/limit4Outcome" },
+    "limit5Outcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/limit5Outcome" },
+    "limit6Outcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/limit6Outcome" },
+    "limitOutcome": { "$ref": "tool-api.v1.13.schema.json#/$defs/limitOutcome" },
+    "guardTargets": { "$ref": "tool-api.v1.13.schema.json#/$defs/guardTargets" },
+    "buildFrontier.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/buildFrontier.request" },
+    "buildFrontier.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/buildFrontier.response" },
+    "buildFrontier.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/buildFrontier.errors" },
+    "closestEntries.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/closestEntries.request" },
+    "closestEntries.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/closestEntries.response" },
+    "closestEntries.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/closestEntries.errors" },
+    "plannerVerbs.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/plannerVerbs.request" },
+    "plannerVerbs.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/plannerVerbs.response" },
+    "plannerVerbs.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/plannerVerbs.errors" },
+    "coreAction": { "$ref": "tool-api.v1.13.schema.json#/$defs/coreAction" },
+    "coreResult": { "$ref": "tool-api.v1.13.schema.json#/$defs/coreResult" },
+    "partResult": { "$ref": "tool-api.v1.13.schema.json#/$defs/partResult" },
+    "gateAndCommit.turn": { "$ref": "tool-api.v1.13.schema.json#/$defs/gateAndCommit.turn" },
+    "eventKey": {
+      "title": "EventKey",
+      "description": "v1.14 (T-1547; README v1.14 default 223, which widens default 209's table): the event table, the keys a turn of texts never gives, each given only by an event from its own source. id_checked: the owner's ID upload landing on the secure page (K-21 finishUpload after K-13 checkUpload; K-22 id_uploads, purpose sign_up, the ID confirmed as given: MC C10), waiting at S1-10. control_proven: Rosie's team's done decision that proves control (a K-37 control or listing_match review item of the business decided done with controlProven true through K-09 v1 decideReviewItem: README defaults 205 and 215), waiting at S1-32. A key joins the table only by a later version naming its source and the step that waits for it.",
+      "type": "string",
+      "enum": ["id_checked", "control_proven"]
+    },
+    "gateAndCommit.event": {
+      "title": "EventInput",
+      "description": "v1.14 (T-1547; the ruling's card A7 (1); R3; README v1.14 defaults 221 to 224): an event on the person's own chat handle, which the handle actor runs as a turn of its own: the ID upload's landing (id_checked, waiting at S1-10) or a team decision that proves control (control_proven, waiting at S1-32). It holds no texts, so the turn has no guard, frontier, decide or core action, the gate runs no limit for a decide part (there is none), and the commit's walk starts at the waiting step with a WalkStart of kind event (default 226). Its service and zone are the handle's, which the runtime reads for the handle, never a text's (default 221). The event's own source (the pending upload, or the review item) is read by the gate from its ref (default 224), and its object key, if any, never rides in the event.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "event"
+        },
+        "eventId": {
+          "description": "The event's own id, made by the caller that hands it to the actor (the upload's page call, A12; staging's team decision, E10), one per source handed (an upload, a decision), so the same source handed again carries the same id and the actor drops a known one as it drops a known text's (default 222). The turn's one event id: the turn's id is its hash (default 222). Opaque here, as every event id is.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "key": {
+          "description": "The key the event gives, from the event table (eventKey; default 223).",
+          "$ref": "#/$defs/eventKey"
+        },
+        "step": {
+          "description": "The step that waits for the key, as the event table names it (default 223): S1-10 for id_checked, S1-32 for control_proven. The walk re-reads it in the turn's pinned graph (default 225).",
+          "$ref": "#/$defs/stepId"
+        },
+        "ref": {
+          "description": "The id of the key's own source, from which the gate reads whether the step waits (default 224): for id_checked, the upload's id as signedUpload issued it (K-21 v1 signedUpload and finishUpload; the pending upload, K-05 v1.24 item 2); for control_proven, the decided review item's id (K-37 review_items.id). Never an object key, a code, a number or a name.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "service": {
+          "description": "The service of the handle's phone, as the runtime reads it for the handle (K-04 phones.chat_way; K-05 v1.24 item 7 if no read gives it already; default 221): imessage, rcs or sms through Linq (K-06 v1 service, email left out: an event's handle is the person's own mobile's). The channel of every outbox row the event turn writes (README v1.5 default 132), in place of the turn's last text's service, which an event turn does not have.",
+          "type": "string",
+          "enum": ["imessage", "rcs", "sms"]
+        },
+        "zone": {
+          "description": "The zone the handle's dates resolve in, as the handle's directory gives it to the turn (runtime/src/turn/turn.ts step 1: 'the handle's directory names the handle (K-04) and the zone its dates resolve in'; the zone a text's sentAt carries for a turn of texts: K-06 v1 sentAt, 'the gateway knows no zone'). The walk's zone for the event turn's rows and clock rows, in place of the turn's first text's (default 221; open gap 210: K-04 handles has no zone column).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/zone"
+        }
+      },
+      "required": ["kind", "eventId", "key", "step", "ref", "service", "zone"],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "description": "id_checked waits at S1-10 (default 223).",
+          "type": "object",
+          "properties": { "key": { "const": "id_checked" }, "step": { "const": "S1-10" } },
+          "required": ["key", "step"]
+        },
+        {
+          "description": "control_proven waits at S1-32 (default 223).",
+          "type": "object",
+          "properties": { "key": { "const": "control_proven" }, "step": { "const": "S1-32" } },
+          "required": ["key", "step"]
+        }
+      ]
+    },
+    "gateAndCommit.request": {
+      "title": "GateAndCommitRequest",
+      "description": "Gate and commit a turn, as v1.8's request (which v1.9 to v1.13 refer to), its keywords word for word, its caller, turn, core actions and 'now' by reference to v1.8's own and its decided, clock and core-only inputs by reference to v1.8's three, with one change (v1.14, T-1547; README 'v1.14'): the input may also be an event (gateAndCommit.event; defaults 221 to 224), whose turn joins no text: its one event id is the event's, it joins no other trace, it carries no service and no chat id, and the turn commits no core action (allOf; default 221). The turn's rule is v1.8's (if, then, else: only a clock's firing may come with no turn, and a clock's turn carries no service and no chat id), so an event's turn is required. Every v1 to v1.13 request is a v1.14 request.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "turn": {
+          "$ref": "tool-api.v1.8.schema.json#/$defs/gateAndCommit.request/properties/turn"
+        },
+        "input": {
+          "description": "What the turn acts on, as v1.8: decided texts (K-02 v1.2's pair), a clock's firing, or only core actions (the guard's keyword-only texts: arch 02 line 115); and from v1.14 an event on the person's own chat handle (R3; default 221).",
+          "oneOf": [
+            {
+              "$ref": "tool-api.v1.8.schema.json#/$defs/gateAndCommit.request/properties/input/oneOf/0"
+            },
+            {
+              "$ref": "tool-api.v1.8.schema.json#/$defs/gateAndCommit.request/properties/input/oneOf/1"
+            },
+            {
+              "$ref": "tool-api.v1.8.schema.json#/$defs/gateAndCommit.request/properties/input/oneOf/2"
+            },
+            {
+              "$ref": "#/$defs/gateAndCommit.event"
+            }
+          ]
+        },
+        "core": {
+          "$ref": "tool-api.v1.8.schema.json#/$defs/gateAndCommit.request/properties/core"
+        },
+        "now": {
+          "$ref": "tool-api.v1.8.schema.json#/$defs/gateAndCommit.request/properties/now"
+        }
+      },
+      "required": ["caller", "turn", "input", "core", "now"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "input": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "clock"
+              }
+            },
+            "required": ["kind"]
+          }
+        },
+        "required": ["input"]
+      },
+      "then": {
+        "description": "A clock's firing: its turn may be null (K-05 v1 fireClock.request.turn); the named rule clockTurn checks the caller and the turn's id rule. A clock's turn has no text, so it carries no service and no chat id (v1.5; README v1.5 default 135).",
+        "properties": {
+          "turn": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "service": false,
+                  "chatId": false
+                }
+              }
+            ]
+          }
+        }
+      },
+      "else": {
+        "description": "Decided texts, core actions only, or an event (v1.14): the turn is required (K-05 v1 commitTurn), as gateAndCommit.turn: the runtime caller fills its service and chat id from the turn's last text (v1.5; README v1.5 default 135), and an event's turn carries neither (allOf below).",
+        "properties": {
+          "turn": {
+            "$ref": "#/$defs/gateAndCommit.turn"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "description": "The input is an event (v1.14).",
+            "properties": {
+              "input": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "event"
+                  }
+                },
+                "required": ["kind"]
+              }
+            },
+            "required": ["input"]
+          },
+          "then": {
+            "description": "An event's turn (README v1.14 defaults 221 and 222): it joins no text, so its one event id is the event's (the named rule eventTurn holds it to input.eventId), it joins no other trace, and it carries no service and no chat id, since the service rides in the input and an event turn has no Linq chat, so a walk that would write a thread is refused as one with no chat id is (the walk's noServiceOrChatId, final by default 217). It commits no core action: it holds no text whose safety outcome or keyword would ride in it (README default 5; default 221).",
+            "properties": {
+              "turn": {
+                "type": "object",
+                "properties": {
+                  "eventIds": {
+                    "type": "array",
+                    "maxItems": 1
+                  },
+                  "joinedTraceIds": {
+                    "type": "array",
+                    "maxItems": 0
+                  },
+                  "service": false,
+                  "chatId": false
+                }
+              },
+              "core": {
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "gateAndCommit.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/gateAndCommit.response" },
+    "effectWritten": { "$ref": "tool-api.v1.13.schema.json#/$defs/effectWritten" },
+    "openQuestionsWritten": { "$ref": "tool-api.v1.13.schema.json#/$defs/openQuestionsWritten" },
+    "gateAndCommit.fired": { "$ref": "tool-api.v1.13.schema.json#/$defs/gateAndCommit.fired" },
+    "gateAndCommit.committed": { "$ref": "tool-api.v1.13.schema.json#/$defs/gateAndCommit.committed" },
+    "turnRefusedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/turnRefusedError" },
+    "notBuiltError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notBuiltError" },
+    "eventNotWaitingError": {
+      "title": "EventNotWaitingError",
+      "description": "v1.14 (T-1547; the ruling's card A7 (2); R35; README v1.14 default 224): gateAndCommit's answer to an event whose own source does not have its step waiting for its key: the source not found, another person's or another business's than the turn's handle and caller, the key already given, or the walk not yet at the step (for control_proven: S1-29's terms consent not written, or the business already live). Nothing was written: the call's transaction is rolled back, so no row, no walk and no turn row moves. It names the event's key and step alone, never its ref, a person or a value. Final: the runtime never resends the call or reruns the turn, and parks nothing and sends nothing; the event is dropped (default 230). Only an event's request is answered eventNotWaiting (gateAndCommit.exchange).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "eventNotWaiting" },
+        "key": { "$ref": "#/$defs/eventKey" },
+        "step": { "$ref": "#/$defs/stepId" }
+      },
+      "required": ["error", "key", "step"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.errors": {
+      "title": "GateAndCommitErrors",
+      "description": "gateAndCommit's errors, as v1.13's (by reference: v1's with v1.13's turnRefused and notBuilt), with one more (v1.14, T-1547; README 'v1.14'): eventNotWaiting, an event its source does not have waiting (eventNotWaitingError; default 224), which gateAndCommit.exchange holds to an event's request. Every v1 to v1.13 error is a v1.14 error.",
+      "anyOf": [
+        { "$ref": "tool-api.v1.13.schema.json#/$defs/gateAndCommit.errors" },
+        { "$ref": "#/$defs/eventNotWaitingError" }
+      ]
+    },
+    "eventSource": {
+      "title": "EventSource",
+      "description": "v1.14 (T-1547; README v1.14 default 232): what an event's own source holds, as the gate reads it before it walks (default 224), stated by a fixture of an event turn so a proof and the named rule eventTurn read it; a fixture's given is never sent. For id_checked, the pending upload the event's ref names (its person and business, as signedUpload kept them: K-05 v1.24 item 2) and that person's own chat handle (the account mobile's handle: K-05 v1.24 item 1); for control_proven, the review item the ref names (its business and its raised_by person: K-37 review_items) and that person's own chat handle. Never the upload's object key, a number or a name.",
+      "type": "object",
+      "properties": {
+        "personId": {
+          "description": "The source's person: the upload's person (id_checked), or the item's raised_by person, the claim's owner (control_proven; R35).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "businessId": {
+          "description": "The source's business: the upload's business, as signedUpload kept it from the link (id_checked), or the item's business (control_proven).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "handleId": {
+          "description": "That person's own chat handle: the handle of the person's account mobile (K-22 accounts.mobile; K-04 phones.handle_id), the handle whose actor the event is handed to (A12, E10).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "waiting": {
+          "description": "Whether the key's own source has the step waiting, as default 224 reads it: for id_checked, a live setupIdCheck link (K-22 page_links, step S1-10) of that person and business and no sign_up id_uploads row of that person on file; for control_proven, a control or listing_match item of that business decided done proving control, S1-29's terms consent written and the business not live.",
+          "type": "boolean"
+        }
+      },
+      "required": ["personId", "businessId", "handleId", "waiting"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.given": {
+      "title": "GateAndCommitGiven",
+      "description": "What a gateAndCommit exchange assumes before its request runs, as v1.5's given (which v1.6 to v1.13 refer to), its fields by reference to v1.5's own, with one optional field more (v1.14, T-1547; README v1.14 default 232): eventSource, which a fixture of an event turn states (gateAndCommit.exchange holds it to an event's exchange). A fixture's given is never sent. Every v1 to v1.13 gateAndCommit given is a v1.14 one.",
+      "type": "object",
+      "properties": {
+        "seeds": { "$ref": "tool-api.v1.5.schema.json#/$defs/gateAndCommit.given/properties/seeds" },
+        "after": { "$ref": "tool-api.v1.5.schema.json#/$defs/gateAndCommit.given/properties/after" },
+        "now": { "$ref": "tool-api.v1.5.schema.json#/$defs/gateAndCommit.given/properties/now" },
+        "stated": { "$ref": "tool-api.v1.5.schema.json#/$defs/gateAndCommit.given/properties/stated" },
+        "note": { "$ref": "tool-api.v1.5.schema.json#/$defs/gateAndCommit.given/properties/note" },
+        "eventSource": { "$ref": "#/$defs/eventSource" }
+      },
+      "required": ["seeds", "after", "now", "stated"],
+      "additionalProperties": false
+    },
+    "statedWrites": { "$ref": "tool-api.v1.13.schema.json#/$defs/statedWrites" },
+    "composeInput.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/composeInput.request" },
+    "composeInput.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/composeInput.response" },
+    "composeInput.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/composeInput.errors" },
+    "fixedLineRowError": { "$ref": "tool-api.v1.13.schema.json#/$defs/fixedLineRowError" },
+    "masterLineMissingError": { "$ref": "tool-api.v1.13.schema.json#/$defs/masterLineMissingError" },
+    "finalizeMessage.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalizeMessage.request" },
+    "finalizeMessage.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalizeMessage.response" },
+    "finalizeMessage.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalizeMessage.errors" },
+    "recordSafetyOutcome.request": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/recordSafetyOutcome.request"
+    },
+    "recordSafetyOutcome.arrival": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/recordSafetyOutcome.arrival"
+    },
+    "arrivalCaller": { "$ref": "tool-api.v1.13.schema.json#/$defs/arrivalCaller" },
+    "recordSafetyOutcome.response": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/recordSafetyOutcome.response"
+    },
+    "safetyRowWritten": { "$ref": "tool-api.v1.13.schema.json#/$defs/safetyRowWritten" },
+    "recordSafetyOutcome.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordSafetyOutcome.errors" },
+    "releaseSafetyHold.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/releaseSafetyHold.request" },
+    "releaseSafetyHold.arrival": { "$ref": "tool-api.v1.13.schema.json#/$defs/releaseSafetyHold.arrival" },
+    "releaseSafetyHold.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/releaseSafetyHold.response" },
+    "releaseSafetyHold.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/releaseSafetyHold.errors" },
+    "recordStopOrStart.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStopOrStart.request" },
+    "recordStopOrStart.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStopOrStart.response" },
+    "recordStopOrStart.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStopOrStart.errors" },
+    "setRecordFlag.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/setRecordFlag.request" },
+    "setRecordFlag.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/setRecordFlag.response" },
+    "setRecordFlag.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/setRecordFlag.errors" },
+    "handOff.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/handOff.request" },
+    "handOff.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/handOff.response" },
+    "handOff.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/handOff.errors" },
+    "answerHandOff.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/answerHandOff.request" },
+    "answerHandOff.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/answerHandOff.response" },
+    "answerHandOff.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/answerHandOff.errors" },
+    "pageTeam.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/pageTeam.request" },
+    "pageTeam.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/pageTeam.response" },
+    "pageTeam.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/pageTeam.errors" },
+    "acknowledgePage.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/acknowledgePage.request" },
+    "acknowledgePage.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/acknowledgePage.response" },
+    "acknowledgePage.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/acknowledgePage.errors" },
+    "openReviewItem.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/openReviewItem.request" },
+    "openReviewItem.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/openReviewItem.response" },
+    "openReviewItem.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/openReviewItem.errors" },
+    "decideReviewItem.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/decideReviewItem.request" },
+    "decideReviewItem.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/decideReviewItem.response" },
+    "decideReviewItem.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/decideReviewItem.errors" },
+    "enterDoor.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/enterDoor.request" },
+    "enterDoor.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/enterDoor.response" },
+    "enterDoor.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/enterDoor.errors" },
+    "sendFixedLine.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendFixedLine.request" },
+    "sendFixedLine.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendFixedLine.response" },
+    "sendFixedLine.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendFixedLine.errors" },
+    "sendsFailing.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendsFailing.request" },
+    "sendsFailing.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendsFailing.response" },
+    "sendsFailing.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendsFailing.errors" },
+    "textingBack.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/textingBack.request" },
+    "textingBack.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/textingBack.response" },
+    "textingBack.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/textingBack.errors" },
+    "calendarLinkDropped.request": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkDropped.request"
+    },
+    "calendarLinkDropped.response": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkDropped.response"
+    },
+    "calendarLinkDropped.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkDropped.errors" },
+    "calendarLinkBack.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkBack.request" },
+    "calendarLinkBack.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkBack.response" },
+    "calendarLinkBack.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkBack.errors" },
+    "sendProofCode.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendProofCode.request" },
+    "sendProofCode.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendProofCode.response" },
+    "sendProofCode.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendProofCode.errors" },
+    "proveCode.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/proveCode.request" },
+    "proveCode.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/proveCode.response" },
+    "proveCode.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/proveCode.errors" },
+    "issueChatLink.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/issueChatLink.request" },
+    "issueChatLink.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/issueChatLink.response" },
+    "issueChatLink.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/issueChatLink.errors" },
+    "setupKey": { "$ref": "tool-api.v1.13.schema.json#/$defs/setupKey" },
+    "journeyThreeKey": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeyThreeKey" },
+    "journeyFourKey": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeyFourKey" },
+    "journeyFiveKey": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeyFiveKey" },
+    "journeySixKey": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySixKey" },
+    "stepKey": { "$ref": "tool-api.v1.13.schema.json#/$defs/stepKey" },
+    "kindId": { "$ref": "tool-api.v1.13.schema.json#/$defs/kindId" },
+    "objectKey": { "$ref": "tool-api.v1.13.schema.json#/$defs/objectKey" },
+    "emailAddress": { "$ref": "tool-api.v1.13.schema.json#/$defs/emailAddress" },
+    "localDate": { "$ref": "tool-api.v1.13.schema.json#/$defs/localDate" },
+    "money": { "$ref": "tool-api.v1.13.schema.json#/$defs/money" },
+    "licenseAsGiven": { "$ref": "tool-api.v1.13.schema.json#/$defs/licenseAsGiven" },
+    "given": { "$ref": "tool-api.v1.13.schema.json#/$defs/given" },
+    "matchKinds.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchKinds.request" },
+    "matchKinds.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchKinds.response" },
+    "matchKinds.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchKinds.errors" },
+    "lookupListing.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/lookupListing.request" },
+    "lookupListing.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/lookupListing.response" },
+    "lookupListing.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/lookupListing.errors" },
+    "saveSetupStep.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSetupStep.request" },
+    "setupStepS2_05": { "$ref": "tool-api.v1.13.schema.json#/$defs/setupStepS2_05" },
+    "saveSetupStepInTurn": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSetupStepInTurn" },
+    "saveSetupStep.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSetupStep.response" },
+    "saveSetupStep.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSetupStep.errors" },
+    "readSetup.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/readSetup.request" },
+    "readSetup.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/readSetup.response" },
+    "readSetup.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/readSetup.errors" },
+    "businessCaller": { "$ref": "tool-api.v1.13.schema.json#/$defs/businessCaller" },
+    "customerBlockedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/customerBlockedError" },
+    "notLiveError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notLiveError" },
+    "safetyHeldError": { "$ref": "tool-api.v1.13.schema.json#/$defs/safetyHeldError" },
+    "waitsForOwnerError": { "$ref": "tool-api.v1.13.schema.json#/$defs/waitsForOwnerError" },
+    "timeEntered": { "$ref": "tool-api.v1.13.schema.json#/$defs/timeEntered" },
+    "serviceEntered": { "$ref": "tool-api.v1.13.schema.json#/$defs/serviceEntered" },
+    "newCustomerEntered": { "$ref": "tool-api.v1.13.schema.json#/$defs/newCustomerEntered" },
+    "enteredBooking": { "$ref": "tool-api.v1.13.schema.json#/$defs/enteredBooking" },
+    "heldTime": { "$ref": "tool-api.v1.13.schema.json#/$defs/heldTime" },
+    "openRequest.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/openRequest.request" },
+    "openRequest.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/openRequest.response" },
+    "openRequest.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/openRequest.errors" },
+    "openRequest.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/openRequest.exchange" },
+    "confirmBusinessBooking.request": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/confirmBusinessBooking.request"
+    },
+    "confirmBusinessBooking.response": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/confirmBusinessBooking.response"
+    },
+    "wrongDoorError": { "$ref": "tool-api.v1.13.schema.json#/$defs/wrongDoorError" },
+    "timeTakenError": { "$ref": "tool-api.v1.13.schema.json#/$defs/timeTakenError" },
+    "confirmBusinessBooking.errors": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/confirmBusinessBooking.errors"
+    },
+    "confirmBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/confirmBusinessBooking.exchange"
+    },
+    "readBackBusinessBooking.request": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/readBackBusinessBooking.request"
+    },
+    "readBackBusinessBooking.response": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/readBackBusinessBooking.response"
+    },
+    "readBackBusinessBooking.errors": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/readBackBusinessBooking.errors"
+    },
+    "readBackBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/readBackBusinessBooking.exchange"
+    },
+    "findCustomer.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/findCustomer.request" },
+    "findCustomer.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/findCustomer.response" },
+    "findCustomer.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/findCustomer.errors" },
+    "findCustomer.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/findCustomer.exchange" },
+    "checkBookingFirst.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkBookingFirst.request" },
+    "checkBookingFirst.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkBookingFirst.response" },
+    "checkBookingFirst.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkBookingFirst.errors" },
+    "checkBookingFirst.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkBookingFirst.exchange" },
+    "setCustomerBlock.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/setCustomerBlock.request" },
+    "setCustomerBlock.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/setCustomerBlock.response" },
+    "setCustomerBlock.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/setCustomerBlock.errors" },
+    "setCustomerBlock.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/setCustomerBlock.exchange" },
+    "customerSideCaller": { "$ref": "tool-api.v1.13.schema.json#/$defs/customerSideCaller" },
+    "wayOffered": { "$ref": "tool-api.v1.13.schema.json#/$defs/wayOffered" },
+    "optionPrice": { "$ref": "tool-api.v1.13.schema.json#/$defs/optionPrice" },
+    "linkIssued": { "$ref": "tool-api.v1.13.schema.json#/$defs/linkIssued" },
+    "textsOffNotice": { "$ref": "tool-api.v1.13.schema.json#/$defs/textsOffNotice" },
+    "savedTimeCapError": { "$ref": "tool-api.v1.13.schema.json#/$defs/savedTimeCapError" },
+    "notExtendableError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notExtendableError" },
+    "timeOffered": { "$ref": "tool-api.v1.13.schema.json#/$defs/timeOffered" },
+    "readBackYes": { "$ref": "tool-api.v1.13.schema.json#/$defs/readBackYes" },
+    "wrongDetailsError": { "$ref": "tool-api.v1.13.schema.json#/$defs/wrongDetailsError" },
+    "overBookingLimitError": { "$ref": "tool-api.v1.13.schema.json#/$defs/overBookingLimitError" },
+    "quoteStateError": { "$ref": "tool-api.v1.13.schema.json#/$defs/quoteStateError" },
+    "notReachableError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notReachableError" },
+    "mobileRequiredError": { "$ref": "tool-api.v1.13.schema.json#/$defs/mobileRequiredError" },
+    "geoUnavailableError": { "$ref": "tool-api.v1.13.schema.json#/$defs/geoUnavailableError" },
+    "matchService.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchService.request" },
+    "matchService.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchService.response" },
+    "matchService.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchService.errors" },
+    "matchService.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchService.exchange" },
+    "setWhoFor.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/setWhoFor.request" },
+    "setWhoFor.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/setWhoFor.response" },
+    "setWhoFor.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/setWhoFor.errors" },
+    "setWhoFor.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/setWhoFor.exchange" },
+    "setReachWay.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/setReachWay.request" },
+    "setReachWay.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/setReachWay.response" },
+    "setReachWay.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/setReachWay.errors" },
+    "setReachWay.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/setReachWay.exchange" },
+    "addCustomer.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/addCustomer.request" },
+    "addCustomer.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/addCustomer.response" },
+    "addCustomer.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/addCustomer.errors" },
+    "addCustomer.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/addCustomer.exchange" },
+    "setPrice.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/setPrice.request" },
+    "setPrice.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/setPrice.response" },
+    "setPrice.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/setPrice.errors" },
+    "setPrice.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/setPrice.exchange" },
+    "quoteFromPhotos.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/quoteFromPhotos.request" },
+    "quoteFromPhotos.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/quoteFromPhotos.response" },
+    "quoteFromPhotos.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/quoteFromPhotos.errors" },
+    "quoteFromPhotos.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/quoteFromPhotos.exchange" },
+    "showTimes.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/showTimes.request" },
+    "showTimes.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/showTimes.response" },
+    "showTimes.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/showTimes.errors" },
+    "showTimes.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/showTimes.exchange" },
+    "saveTime.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveTime.request" },
+    "saveTime.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveTime.response" },
+    "saveTime.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveTime.errors" },
+    "saveTime.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveTime.exchange" },
+    "extendTime.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/extendTime.request" },
+    "extendTime.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/extendTime.response" },
+    "extendTime.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/extendTime.errors" },
+    "extendTime.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/extendTime.exchange" },
+    "joinWaitlist.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/joinWaitlist.request" },
+    "joinWaitlist.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/joinWaitlist.response" },
+    "joinWaitlist.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/joinWaitlist.errors" },
+    "joinWaitlist.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/joinWaitlist.exchange" },
+    "sendSecureLink.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendSecureLink.request" },
+    "sendSecureLink.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendSecureLink.response" },
+    "sendSecureLink.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendSecureLink.errors" },
+    "sendSecureLink.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendSecureLink.exchange" },
+    "checkPlace.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkPlace.request" },
+    "checkPlace.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkPlace.response" },
+    "checkPlace.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkPlace.errors" },
+    "checkPlace.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/checkPlace.exchange" },
+    "saveSecurePage.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSecurePage.request" },
+    "saveSecurePage.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSecurePage.response" },
+    "saveSecurePage.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSecurePage.errors" },
+    "saveSecurePage.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSecurePage.exchange" },
+    "moneyBranch": { "$ref": "tool-api.v1.13.schema.json#/$defs/moneyBranch" },
+    "moneyWord": { "$ref": "tool-api.v1.13.schema.json#/$defs/moneyWord" },
+    "payLinkIssued": { "$ref": "tool-api.v1.13.schema.json#/$defs/payLinkIssued" },
+    "cardNotReadyError": { "$ref": "tool-api.v1.13.schema.json#/$defs/cardNotReadyError" },
+    "documentUnsignedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/documentUnsignedError" },
+    "ownYesNeededError": { "$ref": "tool-api.v1.13.schema.json#/$defs/ownYesNeededError" },
+    "wordsDifferError": { "$ref": "tool-api.v1.13.schema.json#/$defs/wordsDifferError" },
+    "notOfferedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notOfferedError" },
+    "creditsShortError": { "$ref": "tool-api.v1.13.schema.json#/$defs/creditsShortError" },
+    "holdEndedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/holdEndedError" },
+    "showMoneyBefore.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/showMoneyBefore.request" },
+    "showMoneyBefore.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/showMoneyBefore.response" },
+    "showMoneyBefore.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/showMoneyBefore.errors" },
+    "showMoneyBefore.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/showMoneyBefore.exchange" },
+    "settleOffer.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/settleOffer.request" },
+    "settleOffer.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/settleOffer.response" },
+    "settleOffer.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/settleOffer.errors" },
+    "settleOffer.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/settleOffer.exchange" },
+    "signDocument.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/signDocument.request" },
+    "signDocument.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/signDocument.response" },
+    "signDocument.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/signDocument.errors" },
+    "signDocument.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/signDocument.exchange" },
+    "takeMoneyBefore.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/takeMoneyBefore.request" },
+    "takeMoneyBefore.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/takeMoneyBefore.response" },
+    "takeMoneyBefore.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/takeMoneyBefore.errors" },
+    "takeMoneyBefore.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/takeMoneyBefore.exchange" },
+    "refundAtOnce.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/refundAtOnce.request" },
+    "refundAtOnce.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/refundAtOnce.response" },
+    "refundAtOnce.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/refundAtOnce.errors" },
+    "refundAtOnce.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/refundAtOnce.exchange" },
+    "messageWritten": { "$ref": "tool-api.v1.13.schema.json#/$defs/messageWritten" },
+    "journeySixMoneyWord": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySixMoneyWord" },
+    "visitWritten": { "$ref": "tool-api.v1.13.schema.json#/$defs/visitWritten" },
+    "chargeBound": { "$ref": "tool-api.v1.13.schema.json#/$defs/chargeBound" },
+    "requestEndedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/requestEndedError" },
+    "calendarUnreadableError": { "$ref": "tool-api.v1.13.schema.json#/$defs/calendarUnreadableError" },
+    "notPaidYetError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notPaidYetError" },
+    "priceDiffersError": { "$ref": "tool-api.v1.13.schema.json#/$defs/priceDiffersError" },
+    "askOwnerFirst.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/askOwnerFirst.request" },
+    "askOwnerFirst.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/askOwnerFirst.response" },
+    "askOwnerFirst.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/askOwnerFirst.errors" },
+    "askOwnerFirst.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/askOwnerFirst.exchange" },
+    "sendToOnCall.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendToOnCall.request" },
+    "sendToOnCall.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendToOnCall.response" },
+    "sendToOnCall.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendToOnCall.errors" },
+    "sendToOnCall.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendToOnCall.exchange" },
+    "writeBooking.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/writeBooking.request" },
+    "writeBooking.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/writeBooking.response" },
+    "writeBooking.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/writeBooking.errors" },
+    "writeBooking.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/writeBooking.exchange" },
+    "recordStaffTold.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStaffTold.request" },
+    "recordStaffTold.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStaffTold.response" },
+    "recordStaffTold.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStaffTold.errors" },
+    "recordStaffTold.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStaffTold.exchange" },
+    "askAboutClash.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/askAboutClash.request" },
+    "askAboutClash.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/askAboutClash.response" },
+    "askAboutClash.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/askAboutClash.errors" },
+    "askAboutClash.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/askAboutClash.exchange" },
+    "buildFrontier.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/buildFrontier.exchange" },
+    "closestEntries.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/closestEntries.exchange" },
+    "gateAndCommit.exchange": {
+      "title": "GateAndCommitExchange",
+      "description": "One gateAndCommit request with its outcome, as v1.13's (v1.8's keywords, its outcome taking v1.13's errors), word for word, with two changes (v1.14, T-1547; README 'v1.14'): its given is v1.14's, which may state an event's source (default 232), and its outcome takes v1.14's errors, which also hold eventNotWaiting; and one rule more (allOf): an event's request is answered committed with no part, no planner verb and no core result, or with one of gateAndCommit's errors, never fired (defaults 221, 222 and 224), while any other request is never answered eventNotWaiting and its fixture states no event source. A request whose decided result holds K-02 v1.2's unmapped end is answered, when it commits, with end asked, once for the turn; every other request's answer holds no end (README v1.8 default 145). Every v1 to v1.13 gateAndCommit exchange is a v1.14 exchange.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "gateAndCommit" },
+        "given": { "$ref": "#/$defs/gateAndCommit.given" },
+        "request": { "$ref": "#/$defs/gateAndCommit.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/gateAndCommit.response" }, { "$ref": "#/$defs/gateAndCommit.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "description": "The request's decided result holds K-02 v1.2's unmapped end (decideResult.end).",
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "type": "object",
+                "properties": {
+                  "decided": {
+                    "type": "object",
+                    "properties": {
+                      "decide": {
+                        "type": "object",
+                        "required": ["end"]
+                      }
+                    },
+                    "required": ["decide"]
+                  }
+                },
+                "required": ["decided"]
+              }
+            },
+            "required": ["input"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "description": "The unmapped end is answered asked once for the turn: a committed answer holds end (README v1.8 default 145).",
+        "properties": {
+          "outcome": {
+            "if": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "const": "committed"
+                }
+              },
+              "required": ["result"]
+            },
+            "then": {
+              "type": "object",
+              "required": ["end"]
+            }
+          }
+        }
+      },
+      "else": {
+        "description": "Any other request: its answer holds no end, as in v1 to v1.13.",
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "end": false
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "description": "The request's input is an event (v1.14).",
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "event"
+                      }
+                    },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["input"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "description": "An event's turn (README v1.14 defaults 221, 222 and 224): it holds no texts, so its answer is committed with no part, no planner verb and no core result (the walk's rows are in written, its questions in openQuestions), or one of gateAndCommit's errors, eventNotWaiting among them; never fired, which a clock's firing answers.",
+            "properties": {
+              "outcome": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "const": "committed"
+                      },
+                      "parts": {
+                        "type": "array",
+                        "maxItems": 0
+                      },
+                      "planner": {
+                        "type": "null"
+                      },
+                      "core": {
+                        "type": "array",
+                        "maxItems": 0
+                      }
+                    },
+                    "required": ["result"]
+                  },
+                  {
+                    "$ref": "#/$defs/gateAndCommit.errors"
+                  }
+                ]
+              }
+            }
+          },
+          "else": {
+            "description": "Any other request (v1 to v1.13's inputs): eventNotWaiting is an event's answer alone, and only an event's fixture states an event source.",
+            "properties": {
+              "given": {
+                "type": "object",
+                "properties": {
+                  "eventSource": false
+                }
+              },
+              "outcome": {
+                "not": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "const": "eventNotWaiting"
+                    }
+                  },
+                  "required": ["error"]
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "composeInput.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/composeInput.exchange" },
+    "finalizeMessage.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalizeMessage.exchange" },
+    "recordSafetyOutcome.exchange": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/recordSafetyOutcome.exchange"
+    },
+    "releaseSafetyHold.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/releaseSafetyHold.exchange" },
+    "recordStopOrStart.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/recordStopOrStart.exchange" },
+    "setRecordFlag.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/setRecordFlag.exchange" },
+    "handOff.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/handOff.exchange" },
+    "answerHandOff.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/answerHandOff.exchange" },
+    "pageTeam.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/pageTeam.exchange" },
+    "acknowledgePage.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/acknowledgePage.exchange" },
+    "openReviewItem.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/openReviewItem.exchange" },
+    "decideReviewItem.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/decideReviewItem.exchange" },
+    "enterDoor.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/enterDoor.exchange" },
+    "sendFixedLine.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendFixedLine.exchange" },
+    "sendsFailing.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendsFailing.exchange" },
+    "textingBack.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/textingBack.exchange" },
+    "calendarLinkDropped.exchange": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkDropped.exchange"
+    },
+    "calendarLinkBack.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/calendarLinkBack.exchange" },
+    "sendProofCode.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/sendProofCode.exchange" },
+    "proveCode.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/proveCode.exchange" },
+    "issueChatLink.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/issueChatLink.exchange" },
+    "matchKinds.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/matchKinds.exchange" },
+    "lookupListing.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/lookupListing.exchange" },
+    "saveSetupStep.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/saveSetupStep.exchange" },
+    "readSetup.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/readSetup.exchange" },
+    "callName": { "$ref": "tool-api.v1.13.schema.json#/$defs/callName" },
+    "journeySevenCustomerSide": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenCustomerSide" },
+    "journeySevenOwnerSide": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenOwnerSide" },
+    "journeySevenStaffSide": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenStaffSide" },
+    "journeySevenJobSide": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenJobSide" },
+    "journeySevenMessage": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenMessage" },
+    "journeySevenTime": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenTime" },
+    "journeySevenChange": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenChange" },
+    "journeySevenRefund": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenRefund" },
+    "journeySevenFee": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenFee" },
+    "feeChargeBound": { "$ref": "tool-api.v1.13.schema.json#/$defs/feeChargeBound" },
+    "journeySevenAnswer": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenAnswer" },
+    "bookingEndedError": { "$ref": "tool-api.v1.13.schema.json#/$defs/bookingEndedError" },
+    "notOwnChatError": { "$ref": "tool-api.v1.13.schema.json#/$defs/notOwnChatError" },
+    "welfareFirstError": { "$ref": "tool-api.v1.13.schema.json#/$defs/welfareFirstError" },
+    "waitsForPersonError": { "$ref": "tool-api.v1.13.schema.json#/$defs/waitsForPersonError" },
+    "feeAnsweredError": { "$ref": "tool-api.v1.13.schema.json#/$defs/feeAnsweredError" },
+    "remindBeforeVisit.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/remindBeforeVisit.request" },
+    "remindBeforeVisit.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/remindBeforeVisit.response" },
+    "remindBeforeVisit.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/remindBeforeVisit.errors" },
+    "remindBeforeVisit.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/remindBeforeVisit.exchange" },
+    "moveBooking.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveBooking.request" },
+    "journeySevenMoveStep": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenMoveStep" },
+    "journeySevenStageIsPick": { "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenStageIsPick" },
+    "journeySevenStageIsOwnerAnswer": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenStageIsOwnerAnswer"
+    },
+    "journeySevenStageIsCustomerAnswer": {
+      "$ref": "tool-api.v1.13.schema.json#/$defs/journeySevenStageIsCustomerAnswer"
+    },
+    "moveBooking.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveBooking.response" },
+    "moveBooking.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveBooking.errors" },
+    "moveBooking.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveBooking.exchange" },
+    "cancelBooking.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/cancelBooking.request" },
+    "cancelBooking.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/cancelBooking.response" },
+    "cancelBooking.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/cancelBooking.errors" },
+    "cancelBooking.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/cancelBooking.exchange" },
+    "feeDoor.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/feeDoor.request" },
+    "feeDoor.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/feeDoor.response" },
+    "feeDoor.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/feeDoor.errors" },
+    "feeDoor.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/feeDoor.exchange" },
+    "proCantCome.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/proCantCome.request" },
+    "proCantCome.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/proCantCome.response" },
+    "proCantCome.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/proCantCome.errors" },
+    "proCantCome.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/proCantCome.exchange" },
+    "proRunsLate.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/proRunsLate.request" },
+    "proRunsLate.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/proRunsLate.response" },
+    "proRunsLate.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/proRunsLate.errors" },
+    "proRunsLate.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/proRunsLate.exchange" },
+    "ownerChangesIt.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/ownerChangesIt.request" },
+    "ownerChangesIt.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/ownerChangesIt.response" },
+    "ownerChangesIt.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/ownerChangesIt.errors" },
+    "ownerChangesIt.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/ownerChangesIt.exchange" },
+    "classTooFew.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/classTooFew.request" },
+    "classTooFew.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/classTooFew.response" },
+    "classTooFew.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/classTooFew.errors" },
+    "classTooFew.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/classTooFew.exchange" },
+    "changeWhatsBooked.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/changeWhatsBooked.request" },
+    "changeWhatsBooked.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/changeWhatsBooked.response" },
+    "changeWhatsBooked.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/changeWhatsBooked.errors" },
+    "changeWhatsBooked.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/changeWhatsBooked.exchange" },
+    "customerRunsLate.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/customerRunsLate.request" },
+    "customerRunsLate.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/customerRunsLate.response" },
+    "customerRunsLate.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/customerRunsLate.errors" },
+    "customerRunsLate.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/customerRunsLate.exchange" },
+    "changePlan.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/changePlan.request" },
+    "changePlan.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/changePlan.response" },
+    "changePlan.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/changePlan.errors" },
+    "changePlan.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/changePlan.exchange" },
+    "finalCount.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalCount.request" },
+    "finalCount.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalCount.response" },
+    "finalCount.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalCount.errors" },
+    "finalCount.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/finalCount.exchange" },
+    "firstStepsDue.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/firstStepsDue.request" },
+    "firstStepsDue.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/firstStepsDue.response" },
+    "firstStepsDue.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/firstStepsDue.errors" },
+    "firstStepsDue.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/firstStepsDue.exchange" },
+    "relayQuestion.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/relayQuestion.request" },
+    "relayQuestion.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/relayQuestion.response" },
+    "relayQuestion.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/relayQuestion.errors" },
+    "relayQuestion.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/relayQuestion.exchange" },
+    "moveUpdates.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveUpdates.request" },
+    "moveUpdates.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveUpdates.response" },
+    "moveUpdates.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveUpdates.errors" },
+    "moveUpdates.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/moveUpdates.exchange" },
+    "passOnNote.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/passOnNote.request" },
+    "passOnNote.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/passOnNote.response" },
+    "passOnNote.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/passOnNote.errors" },
+    "passOnNote.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/passOnNote.exchange" },
+    "someoneElseNamedBooking": { "$ref": "tool-api.v1.13.schema.json#/$defs/someoneElseNamedBooking" },
+    "someoneElseAsks.request": { "$ref": "tool-api.v1.13.schema.json#/$defs/someoneElseAsks.request" },
+    "someoneElseAsks.response": { "$ref": "tool-api.v1.13.schema.json#/$defs/someoneElseAsks.response" },
+    "someoneElseAsks.errors": { "$ref": "tool-api.v1.13.schema.json#/$defs/someoneElseAsks.errors" },
+    "someoneElseAsks.exchange": { "$ref": "tool-api.v1.13.schema.json#/$defs/someoneElseAsks.exchange" }
+  }
+}
