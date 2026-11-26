@@ -1,0 +1,19 @@
+{
+  "after": ["seed-pending-upload.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "select",
+    "table": "pending_uploads",
+    "columns": ["id", "person_id", "business_id", "purpose", "content_type", "created_at", "expires_at", "finished_at"],
+    "where": {
+      "id": "upload-sam-re-check"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

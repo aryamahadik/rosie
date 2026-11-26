@@ -1,0 +1,20 @@
+{
+  "after": ["seed-pending-upload.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam"
+    },
+    "action": "select",
+    "table": "pending_uploads",
+    "columns": ["id", "purpose", "content_type", "finished_at"],
+    "where": {
+      "id": "upload-sam-re-check"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

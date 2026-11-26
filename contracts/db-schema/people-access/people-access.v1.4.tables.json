@@ -1,0 +1,329 @@
+{
+  "part": "people-access",
+  "version": "v1.4",
+  "tables": [
+    {
+      "name": "pending_uploads",
+      "description": "Each upload a page's signedUpload made for an ID document, kept on the server under the upload id the page hands on (K-21 v1 README: 'an upload id the server binds to its key, person, business and purpose'; K-13 uploadLink: 'the caller keeps the first with its upload id'): the person it was made for, the business its page was for (null for a sign_up ID, which is the person's for every company: K-05 v1.24 item 86), its purpose, its object key sealed under the person's key, its media type, when it was made, when its signed address lapses, and when finishUpload found the file stored (K-13 checkUpload). An upload in flight is neither a stored ID (id_uploads, which keeps meaning 'stored and confirmed': MC C10) nor a page link; the event turn copies the sealed key into S1-10's id_uploads row once the file is stored (K-09 default 225), and nothing is written to id_uploads before then. A lapsed upload expires by expires_at without being touched (DL-1232). v1.4 adds this table and restates page_links (below) with one new index; v1's ten tables, v1.2's sign_in_attempts and v1.3's staging_testers stay as their lists give them, so the part at v1.4 is v1's, v1.2's, v1.3's and v1.4's lists together, with page_links as v1.4 gives it.",
+      "source": "DL-1232 (the lead's ruling on K-05 open gap 107); K-05 v1.24 item 86 (readPendingUpload) and v1.25 item 94 (readUploadFinishedAt); K-21 v1 README 'Uploads, Stripe and calendars carry only links and ids' (signedUpload, finishUpload); K-13 uploadLink and checkUpload; K-09 v1.14 defaults 224 and 225; MC C10; Q-31",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The upload id the page hands on (K-21 v1 signedUpload's upload id, finishUpload's request and the event's ref: K-05 v1.24 readPendingUpload.request.uploadId): an opaque string the server makes and nothing parses (CQ-09; rule 3). Never the object key, and never built from it.",
+          "source": "DL-1232 ('id (the upload id the page hands on)'); K-21 v1 README (default 12: 'the page names an upload id, never an object key'); CQ-09; README rule 3"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person the upload was made for: the page's signed-in person (K-05 v1.24 pendingUpload.personId), whose key seals object_key and whose id_uploads row the event turn writes.",
+          "source": "DL-1232; K-21 v1 README ('bound on the server to the person'); K-05 v1.24 item 86"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business the upload's page was for (K-05 v1.24 pendingUpload.businessId), or null for a sign_up ID, which is the person's for every company (K-05 v1.24 item 86; read-pending-upload-sam-id), as K-22 v1's id_uploads holds no business. Row-level security scopes by it (rule 11), as contact_changes' business_id, which may be null, scopes that table.",
+          "source": "DL-1232 ('business_id'; 'row-level security by business as K-22's other tables'); K-05 v1.24 pendingUpload.businessId ('The business the page was for, or null'); K-21 v1 README ('bound on the server to the ... business'); README default 30"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "sign_up (S1-10's ID at sign-up) or re_check (S13-45 row 8's ID re-check), as K-22 v1's id_uploads.purpose, which the event turn's row takes from it.",
+          "source": "DL-1232 ('purpose (sign_up or re_check)'); K-22 v1 id_uploads.purpose; S1-10; S13-45 row 8"
+        },
+        {
+          "name": "object_key",
+          "type": "bytea",
+          "null": false,
+          "audience": "never",
+          "sealedBy": "person_id",
+          "description": "The R2 object key K-13 uploadLink made for the file, sealed under the person's key (core sealing_keys), so deleting the key erases the way to the file. Never read back to a page (DL-1232): only K-05 item 86 reads it, on the runtime side, as the sealed bytes stored (sealedBytes), and the event turn copies those bytes as they are into S1-10's id_uploads.object_key (K-05 v1.24 default 233).",
+          "source": "DL-1232 ('object_key (sealed, bytea, never read back to a page)'); K-22 v1 id_uploads.object_key; K-13 uploadLink; K-05 v1.24 item 86 and default 233; arch 01 line 93; Q-31"
+        },
+        {
+          "name": "content_type",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The media type the upload was made for (K-13 uploadLink's type in), which finishUpload's K-13 checkUpload confirms from the stored file's leading bytes before finished_at is set (README rule 11); K-05 item 86 answers it as contentType, and S1-10's id_uploads row takes it (K-09 default 225).",
+          "source": "DL-1232 ('content_type'); K-13 uploadLink and checkUpload; K-05 v1.24 pendingUpload.contentType; K-09 v1.14 default 225"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When signedUpload made the upload and wrote this row.",
+          "source": "DL-1232 ('created_at'); K-21 v1 signedUpload"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the upload's short-lived signed address lapses (K-21 v1 README: 'a short-lived signed address for one file'). A lapsed upload is left as it is, never deleted or updated (DL-1232: 'lets a lapsed upload expire without touching it'); its length is a setting (open gaps).",
+          "source": "DL-1232 ('expires_at'); K-21 v1 README 'Uploads'; K-13 uploadLink ('a short-lived link for one file')"
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When finishUpload found the file stored, once K-13 checkUpload answered stored; null until then, and for good when the file never came. Set once by the runtime side, the one column it may update (rule 11). K-05 item 86 answers none while it is null ('its file never came'), item 94 answers it as finishedAt, item 93 checks the S1-10 link at it, and S1-10's id_uploads row takes it as uploaded_at (K-09 default 225).",
+          "source": "DL-1232 ('finished_at (null until K-13 checkUpload answers stored)'); K-05 v1.24 item 86 and v1.25 items 93 and 94; K-09 v1.14 defaults 224 and 225"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "pending_uploads_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pending_uploads_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "pending_uploads_purpose_known",
+          "expression": "purpose in ('sign_up', 're_check')",
+          "source": "DL-1232 ('purpose (sign_up or re_check)'); K-22 v1 id_uploads_purpose_known"
+        },
+        {
+          "name": "pending_uploads_finished_after_created",
+          "expression": "finished_at is null or finished_at >= created_at",
+          "source": "DL-1232 (finished_at set once the file is stored, after signedUpload made the row); K-22 v1.1 page_links_ended_after_issue; K-22 v1.3 staging_testers_removed_after_added"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "page_links",
+      "description": "Each signed link to a page (K-21 v1 openLink; A4-42: 'links are always the host plus a short code'): the business the page acts in, the person it was made for, what it is for (the page it opens), the step that sent it, its code kept only as its sha256, the contact it went to, when it lapses, and when and why it ended. A link names which page, which business and whose page, never who is at the browser (FS line 701; S13-45: 'Opening a link never counts'): the page acts for that person only when a session of theirs comes with the request (K-21 v1; rule 4). Restated whole in v1.4, as v1.1 lists it, with one index more, page_links_person_step_idx (K-05 v1.25 item 93; DL-1240): no column, key, constraint, grant, policy or call of v1.1 changes, and v1.1's file stays as it is.",
+      "source": "A4-42; FS line 701; S13-45 rows 3 and 8; S1-10 ('Checks the owner's mobile and ID, once'); S1-77; S2-06; D75; K-21 v1 openLink, linkPage, signedInLinkPage, linkExpired; BP rule 7; T-030 round 2 (the action-layer engineer's FAIL on 2413b65; DL-109); v1.4: K-05 v1.25 item 93, DL-1240, DL-1243",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The link row's id: an opaque string code makes and never parses (CQ-09; rule 3). Never the code, and never built from it.",
+          "source": "CQ-09; README rule 3"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business the page acts in: the business being set up (S1-10, S1-77, the registration screens) or the one whose staff page it is (S2-06). Row-level security scopes by it (rule 8).",
+          "source": "K-21 v1 README ('The business is the signed link's own'); arch 10 line 546; FS line 721"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person the link was made for: the owner (S1-10, S1-77, the registration screens) or the team member (S2-06). The page acts for them only when a session of theirs comes with the request (K-21 v1; rule 4), and a sign-in started from the page's own link (K-21 v1 signInStart, account link) sends its code only to this person's own mobile or email on file (accounts).",
+          "source": "K-21 v1 README ('A link is never the proof'; default 8); S13-45; FS line 701; README rule 4"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "What the link is for, which is the page it opens (K-21 v1 pageKind): setup_id_check (setupIdCheck, S1-10's secure page: the ID upload and the owner's email), owner_confirm (ownerConfirm, S1-77's owner link), registration (registration, the owner's registration screens 0 to 24, FS section 6.1) or staff_page (staffPage, S2-06's secure page for a team member).",
+          "source": "K-21 v1 pageKind; S1-10; S1-77; FS section 6.1; S2-06"
+        },
+        {
+          "name": "step_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The step that sent the link (K-21 v1 openLink.stepId): S1-10 for setup_id_check, S1-77 for owner_confirm, S2-06 for staff_page, and for registration the journey 1 step whose message carried it (such as S1-27's Stripe link, S1-29's preview link or S1-79's summary).",
+          "source": "K-21 v1 openLink.response.stepId; K-01 v1 stepId; S1-27; S1-29; S1-79"
+        },
+        {
+          "name": "code_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of the link's code in UTF-8, lowercase hex, never the code (BP rule 7). The code is the part after the host (A4-42), made by a cryptographically secure random generator with at least 128 bits (K-21 v1 README default 18), so its plain sha256 cannot be reversed by trying codes, unlike a short proof code, whose hash is keyed (default 7). The page entry finds the link only by it, through page_link_for_code (rule 8); no Tool API column grant reaches it.",
+          "source": "BP rule 7; A4-42; K-21 v1 linkCode; the security reviewer's N4 on T-030; README rule 8"
+        },
+        {
+          "name": "sent_to_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person's own contact the link went to, in the message that carried it (core person_handles, so never someone else's): their chat, or their email on file. A contact change ends every link sent before it (D75; S13-45 row 3).",
+          "source": "S13-45 row 3; D75; RULES 9.1; core person_handles"
+        },
+        {
+          "name": "issued_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the commit that sent the link wrote it (rule 8).",
+          "source": "README rule 8; arch 10 line 508"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When the link lapses (K-21 v1 openLink.expiresAt): from then page_link_for_code gives no row and the page shows the expired page. Its length is a setting; the fixtures' 7 days are an example (K-21 v1 open gap 4).",
+          "source": "K-21 v1 openLink.response.expiresAt and open gap 4"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the link was ended before it lapsed, or null while it is live. Set once and never cleared (rule 8's update policy).",
+          "source": "S1-10 ('once'); D75; S13-45 row 3; RULES 8.7; S11-100"
+        },
+        {
+          "name": "ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Why it ended: step_done (a setup link once its step has given its keys: S1-10 'Checks the owner's mobile and ID, once'; security note N10 on K-09), contact_changed (a contact change ends every link and page sent before it: D75; S13-45 row 3), left (the person left the team: RULES 8.7; S13-56) or handed_over (the business was handed over: S11-100), as sessions.ended_why names its ends. Null while live.",
+          "source": "S1-10; D75; S13-45 row 3; RULES 8.7; S13-56; S11-100; K-22 v1 sessions.ended_why"
+        },
+        {
+          "name": "ended_by_contact_change_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The contact change that ended it (v1's contact_changes), exactly when ended_why is contact_changed; null otherwise.",
+          "source": "D75; S13-45 row 3; FS line 756"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a link ended from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; README rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "page_links_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] }
+        },
+        {
+          "name": "page_links_person_fk",
+          "columns": ["person_id"],
+          "references": { "table": "persons", "columns": ["id"] }
+        },
+        {
+          "name": "page_links_sent_to_fk",
+          "columns": ["person_id", "sent_to_handle_id"],
+          "references": { "table": "person_handles", "columns": ["person_id", "handle_id"] }
+        },
+        {
+          "name": "page_links_contact_change_fk",
+          "columns": ["ended_by_contact_change_id"],
+          "references": { "table": "contact_changes", "columns": ["id"] }
+        }
+      ],
+      "unique": [
+        {
+          "name": "page_links_code_key",
+          "columns": ["code_sha256"],
+          "source": "A4-42 (a short code finds one link); K-21 v1 linkExpired (an unknown code gets one answer)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "page_links_code_hash_form",
+          "expression": "code_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7 (only a hash is stored); K-22 v1 sessions_token_hash_form"
+        },
+        {
+          "name": "page_links_purpose_known",
+          "expression": "purpose in ('setup_id_check', 'owner_confirm', 'registration', 'staff_page')",
+          "source": "K-21 v1 pageKind (journeys 1 and 2)"
+        },
+        {
+          "name": "page_links_purpose_step",
+          "expression": "(purpose = 'setup_id_check' and step_id = 'S1-10') or (purpose = 'owner_confirm' and step_id = 'S1-77') or (purpose = 'staff_page' and step_id = 'S2-06') or (purpose = 'registration' and step_id ~ '^S1-[0-9]{2}$')",
+          "source": "K-21 v1 pageKind (setupIdCheck S1-10, ownerConfirm S1-77, staffPage S2-06, registration FS section 6.1's journey 1 steps)"
+        },
+        {
+          "name": "page_links_expires_after_issue",
+          "expression": "expires_at > issued_at",
+          "source": "K-21 v1 openLink.response.expiresAt"
+        },
+        {
+          "name": "page_links_end_has_why",
+          "expression": "(ended_at is null) = (ended_why is null)",
+          "source": "S1-10; D75; RULES 8.7; S11-100"
+        },
+        {
+          "name": "page_links_end_why_known",
+          "expression": "ended_why in ('step_done', 'contact_changed', 'left', 'handed_over')",
+          "source": "S1-10 ('once'); D75; S13-45 row 3; RULES 8.7; S11-100"
+        },
+        {
+          "name": "page_links_contact_change_named",
+          "expression": "(ended_why is not distinct from 'contact_changed') = (ended_by_contact_change_id is not null)",
+          "source": "D75; S13-45 row 3; FS line 756"
+        },
+        {
+          "name": "page_links_ended_after_issue",
+          "expression": "ended_at is null or ended_at >= issued_at",
+          "source": "arch 09 line 457 (who, what, when)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "page_links_person_live_idx",
+          "columns": ["person_id"],
+          "where": "ended_at is null",
+          "why": "A contact change, a leaver or a hand-over ends the person's live links in its own commit (D75; S13-45 row 3; RULES 8.7; S11-100)."
+        },
+        {
+          "name": "page_links_person_step_idx",
+          "columns": ["person_id", "business_id", "purpose", "step_id"],
+          "why": "New in v1.4 (K-05 v1.25 item 93, liveStepLinkOf; DL-1240): a person's link at one business, purpose and step that is live at a time the caller names (ended_at null or after it, expires_at after it), an ended link included, which page_links_person_live_idx (ended_at is null) cannot serve. Not partial; built concurrently as its migration file's only statement (README rule 12)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

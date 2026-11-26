@@ -1,0 +1,20 @@
+{
+  "after": ["seed-pending-upload.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "update",
+    "table": "pending_uploads",
+    "set": {
+      "finished_at": "2026-10-30T08:59:00Z"
+    },
+    "where": {
+      "id": "upload-sam-re-check"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["pending_uploads_finished_after_created"]
+    }
+  }
+}

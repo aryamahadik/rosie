@@ -1,0 +1,19 @@
+{
+  "after": ["seed-pending-upload.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "update",
+    "table": "pending_uploads",
+    "set": {
+      "object_key": "\\x6b32322d736565642d7365616c65642d6f746865722d6b65792d6e6f742d7265616c"
+    },
+    "where": {
+      "id": "upload-sam-re-check"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

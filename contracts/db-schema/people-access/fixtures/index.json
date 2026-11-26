@@ -423,6 +423,62 @@
       "expect": "refuse",
       "shows": "The runtime side moving Tester One's live listing to Tester Two is refused (rosie_job holds UPDATE of removed_at and version only, SQLSTATE 42501): a listing is ended, never moved to another person or re-dated; the same update setting removed_at to 08:00Z in place of person_id, which ends the listing, passes",
       "source": "README rule 10; K-36 v1 ('a member leaves the list by removed_at, never by a delete')"
+    },
+    {
+      "file": "seed-pending-upload.json",
+      "version": "v1.4",
+      "table": "pending_uploads",
+      "expect": "accept",
+      "shows": "Two uploads Sam's pages asked signedUpload for, each kept under its upload id with its object key sealed under Sam's key (stand-in bytes): his sign_up ID of Oct 19, with no business (a sign_up ID is his for every company), finished at 14:10 when checkUpload found the JPEG stored, the same sealed key and time seed-owner-id-upload's id_uploads row holds; and a re_check upload made on his page at Lee's Barbershop on Oct 30, whose file never came, left unfinished after its signed address lapsed at 09:15",
+      "source": "README rule 11; DL-1232; K-05 v1.24 item 86 (readPendingUpload) and v1.25 item 94 (readUploadFinishedAt); K-09 v1.14 default 225 (id_uploads.uploaded_at is the finished time); MC C10; S1-10; S13-45 row 8; SPEC-master 6"
+    },
+    {
+      "file": "invalid/refuse-pending-upload-purpose-unknown.json",
+      "version": "v1.4",
+      "table": "pending_uploads",
+      "expect": "refuse",
+      "shows": "A pending upload whose purpose is a license (another file's purpose, never an ID's) is refused by CHECK pending_uploads_purpose_known (SQLSTATE 23514); the same row with re_check passes",
+      "source": "README rule 11; DL-1232 ('purpose (sign_up or re_check)'); K-22 v1 id_uploads_purpose_known"
+    },
+    {
+      "file": "invalid/refuse-pending-upload-finished-before-created.json",
+      "version": "v1.4",
+      "table": "pending_uploads",
+      "expect": "refuse",
+      "shows": "The runtime side setting Sam's re_check upload finished at 08:59, before signedUpload made it at 09:00, is refused by CHECK pending_uploads_finished_after_created (SQLSTATE 23514); the same update at 09:02 passes",
+      "source": "README rule 11; DL-1232 ('finished_at (null until K-13 checkUpload answers stored)')"
+    },
+    {
+      "file": "invalid/refuse-pending-upload-tool-api-read.json",
+      "version": "v1.4",
+      "table": "pending_uploads",
+      "expect": "refuse",
+      "shows": "Sam's own call scoped to Lee's Barbershop reading his re_check upload is refused (no Tool API grant on pending_uploads, SQLSTATE 42501), even for columns that hold no object key: only K-05's runtime reads answer a pending upload; the same read on the runtime side returns the row",
+      "source": "README rule 11; DL-1232 ('rosie_app none'); K-05 v1.24 item 86 and v1.25 item 94 (rosie_job)"
+    },
+    {
+      "file": "invalid/refuse-pending-upload-written-by-tool-api.json",
+      "version": "v1.4",
+      "table": "pending_uploads",
+      "expect": "refuse",
+      "shows": "Sam's own call scoped to Lee's Barbershop writing a pending upload is refused (no Tool API grant on pending_uploads, SQLSTATE 42501): only the page's signedUpload, on the runtime side, makes one; the same insert on the runtime side passes",
+      "source": "README rule 11; DL-1232 ('rosie_job may SELECT, INSERT ...; rosie_app none'; 'The page's signedUpload writes the row')"
+    },
+    {
+      "file": "invalid/refuse-pending-upload-key-replaced.json",
+      "version": "v1.4",
+      "table": "pending_uploads",
+      "expect": "refuse",
+      "shows": "The runtime side replacing the sealed object key of Sam's re_check upload is refused (rosie_job holds UPDATE of finished_at only, SQLSTATE 42501): an upload's key, person, business, purpose and type stay as signedUpload bound them; the same update setting finished_at to 09:02 in place of object_key passes",
+      "source": "README rule 11; DL-1232 ('rosie_job may SELECT, INSERT and UPDATE finished_at'); K-21 v1 README ('an upload id the server binds to its key, person, business and purpose')"
+    },
+    {
+      "file": "invalid/refuse-pending-upload-other-business-read.json",
+      "version": "v1.4",
+      "table": "pending_uploads",
+      "expect": "refuse",
+      "shows": "The runtime side scoped to the yoga studio reading Sam's re_check upload at Lee's Barbershop gets no row: row-level security by business, as K-22's other business-scoped tables; the barbershop's own scope, and the runtime side with no business scope (K-05 items 86 and 94), read it",
+      "source": "README rule 11; DL-1232 ('row-level security by business as K-22's other tables'); 0020's runtime policy (0012's pattern); arch 10 line 546"
     }
   ]
 }
