@@ -1,0 +1,16 @@
+{
+  "call": "readUploadFinishedAt",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:31:05Z",
+    "note": "An upload id under which nothing is kept (never signed, or its file never came): none, one answer for both, as item 86's read-pending-upload-unknown, and the event turn writes nothing."
+  },
+  "request": {
+    "uploadId": "upload-demo-owner-9"
+  },
+  "outcome": {
+    "result": "none",
+    "uploadId": "upload-demo-owner-9"
+  }
+}

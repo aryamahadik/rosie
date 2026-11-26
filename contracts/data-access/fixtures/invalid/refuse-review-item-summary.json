@@ -1,0 +1,28 @@
+{
+  "call": "reviewItemById",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:12:03Z",
+    "note": "review-item-demo-control-proven whose item also carries its summary: the summary is Rosie's team's words for the team console alone (K-37 rule 2), and the gate needs only the item's business, kind, state, raised_by, decided time and decision. Refused for its one fault, outcome.item.summary; put right, it is review-item-demo-control-proven."
+  },
+  "request": {
+    "reviewItemId": "review-s1-75-demo-up-1"
+  },
+  "outcome": {
+    "result": "reviewItem",
+    "item": {
+      "id": "review-s1-75-demo-up-1",
+      "businessId": "biz-demo-owner",
+      "kind": "control",
+      "state": "done",
+      "raisedByPersonId": "person-demo-owner",
+      "decidedAt": "2026-10-20T15:12:00Z",
+      "decision": {
+        "outcome": "Control proven by Rosie's team.",
+        "controlProven": true
+      },
+      "summary": "Check the owner's ID against the business. Claim: owner."
+    }
+  }
+}

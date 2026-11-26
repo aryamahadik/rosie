@@ -1,0 +1,21 @@
+{
+  "call": "readWaitingStep",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:31:40Z",
+    "note": "The world of K-09 v1.14's commit-event-id-checked-held.json: the upload's event turn committed while the owner's text 'Done, uploaded it' was unread, so it wrote S1-10's sign_up K-22 id_uploads row for person-demo-owner and its turn's record, and the walk did not move (K-09 v1.14 default 233). The walk's record of the stop at S1-10 on id_checked is still live (README open gap 109's record, written by the test once its home is ruled), and the key is now on file. The queued text's own turn reads this before its parts and resumes the walk at S1-10 with a WalkStart of kind resume (K-09 v1.14 default 235)."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "waiting",
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "step": "S1-10",
+    "key": "id_checked",
+    "keyOnFile": true
+  }
+}

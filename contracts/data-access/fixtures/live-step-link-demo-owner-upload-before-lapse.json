@@ -1,0 +1,25 @@
+{
+  "call": "liveStepLinkOf",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T15:00:20Z",
+    "note": "As live-step-link-demo-owner-s1-10, but the upload finished at 14:59:50, ten seconds before the link lapsed at 15:00:00, and its event turn runs at 15:00:20, after the lapse (it queued behind a running turn of the owner's). The gate names the upload's own finished time, never the turn's (K-09 v1.14 default 224 id_checked (1), round 3), so the link is live at that time and S1-10 is still waiting: the upload is never lost to the lapse. The rows are written by the test as noted (page_links link-s1-10-demo-s109-1, issued 2026-10-12T15:00:00Z, expiring 2026-10-19T15:00:00Z, not ended)."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "purpose": "setup_id_check",
+    "step": "S1-10",
+    "at": "2026-10-19T14:59:50Z"
+  },
+  "outcome": {
+    "result": "live",
+    "link": {
+      "id": "link-s1-10-demo-s109-1",
+      "purpose": "setup_id_check",
+      "step": "S1-10",
+      "expiresAt": "2026-10-19T15:00:00Z"
+    }
+  }
+}

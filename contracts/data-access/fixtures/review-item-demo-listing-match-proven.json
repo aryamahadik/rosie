@@ -1,0 +1,27 @@
+{
+  "call": "reviewItemById",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T16:40:03Z",
+    "note": "Another world of the demo owner's (stand-in ids of its own): S1-76 opened a K-37 listing_match item on the owner's claim, review-s1-76-demo-lm-1 (business biz-demo-owner-lm, subject business_setup biz-demo-owner-lm, raised by person-demo-owner, its summary one of the owner's three sentences), and Rosie's team decided it done proving control at 2026-10-20T16:40:00Z, which K-09 decideReviewItem allows for a listing_match item on an owner's claim alone (K-09 default 205; review.ts default 30), writing biz-demo-owner-lm's K-23 business_setup control_proven_at 2026-10-20T16:40:00Z with control_proven_via team_check in the same commit. The rows are written by the test as noted. A listing_match item's decision answers controlProven as a control item's does (K-09 v1.14 open gap 215 (2), round 3)."
+  },
+  "request": {
+    "reviewItemId": "review-s1-76-demo-lm-1"
+  },
+  "outcome": {
+    "result": "reviewItem",
+    "item": {
+      "id": "review-s1-76-demo-lm-1",
+      "businessId": "biz-demo-owner-lm",
+      "kind": "listing_match",
+      "state": "done",
+      "raisedByPersonId": "person-demo-owner",
+      "decidedAt": "2026-10-20T16:40:00Z",
+      "decision": {
+        "outcome": "Listing checked: the owner's own listing.",
+        "controlProven": true
+      }
+    }
+  }
+}

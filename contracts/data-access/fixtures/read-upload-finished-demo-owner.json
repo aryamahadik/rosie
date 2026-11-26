@@ -1,0 +1,17 @@
+{
+  "call": "readUploadFinishedAt",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:31:05Z",
+    "note": "The demo owner's world (as K-09 v1.14's commit-event-id-checked.json): signedUpload issued upload-demo-owner-1 for person-demo-owner's sign_up ID, and finishUpload recorded it finished at 14:31:02 once K-13 checkUpload passed, then handed the event {id_checked, S1-10, upload-demo-owner-1}. The pending upload is kept where item 86 reads it (open gap 107), written by the test as that home holds it once ruled. The event turn's gate reads the finished time by the upload id, checks the link at it (live-step-link-demo-owner-s1-10), and S1-10's id_uploads row takes it as uploaded_at (K-09 v1.14 defaults 224 and 225). The object key is never read here."
+  },
+  "request": {
+    "uploadId": "upload-demo-owner-1"
+  },
+  "outcome": {
+    "result": "finished",
+    "uploadId": "upload-demo-owner-1",
+    "finishedAt": "2026-10-19T14:31:02Z"
+  }
+}

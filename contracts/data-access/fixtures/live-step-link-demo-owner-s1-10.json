@@ -1,0 +1,25 @@
+{
+  "call": "liveStepLinkOf",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:31:05Z",
+    "note": "The demo owner's world on staging's allow-listed test phone (fictional ids, as K-09 v1.14's event fixtures: person-demo-owner, biz-demo-owner, handle-demo-owner). S1-10's writer issued the owner's secure link a week ago: one K-22 v1.1 page_links row, link-s1-10-demo-s109-1, business biz-demo-owner, person person-demo-owner, purpose setup_id_check, step S1-10, its code's sha256 only, sent to handle-demo-owner, issued 2026-10-12T15:00:00Z, expiring 2026-10-19T15:00:00Z, not ended. The owner's upload upload-demo-owner-1 finished at 14:31:02 (readUploadFinishedAt, read-upload-finished-demo-owner), and the event turn's gate reads the link at that time. The rows are written by the test as noted, since no frozen seed holds them. The code's hash is never read."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "purpose": "setup_id_check",
+    "step": "S1-10",
+    "at": "2026-10-19T14:31:02Z"
+  },
+  "outcome": {
+    "result": "live",
+    "link": {
+      "id": "link-s1-10-demo-s109-1",
+      "purpose": "setup_id_check",
+      "step": "S1-10",
+      "expiresAt": "2026-10-19T15:00:00Z"
+    }
+  }
+}

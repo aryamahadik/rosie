@@ -1,0 +1,24 @@
+{
+  "call": "reviewItemById",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:40:00Z",
+    "note": "The demo owner's world just after the upload's event turn (K-09 v1.14 commit-event-id-checked.json): S1-75's K-37 control item review-s1-75-demo-up-1 (business biz-demo-owner, subject business_setup biz-demo-owner, raised by person-demo-owner) is open and undecided, written by the test as noted. It is answered with no decided time and no decision."
+  },
+  "request": {
+    "reviewItemId": "review-s1-75-demo-up-1"
+  },
+  "outcome": {
+    "result": "reviewItem",
+    "item": {
+      "id": "review-s1-75-demo-up-1",
+      "businessId": "biz-demo-owner",
+      "kind": "control",
+      "state": "open",
+      "raisedByPersonId": "person-demo-owner",
+      "decidedAt": null,
+      "decision": null
+    }
+  }
+}

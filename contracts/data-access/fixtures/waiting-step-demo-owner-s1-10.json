@@ -1,0 +1,21 @@
+{
+  "call": "readWaitingStep",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:20:00Z",
+    "note": "The demo owner's world before the upload: the owner's turn that answered S1-09 walked on to S1-10 and stopped there waitsOnEvent on id_checked (K-09 default 209), and that commit wrote the walk's record of the stop for person-demo-owner at biz-demo-owner, step S1-10, key id_checked (the record README open gap 109 names, written by the test once its home is ruled). No sign_up K-22 id_uploads row of person-demo-owner is on file, so the key is not on file and the owner's next text resumes nothing (K-09 v1.14 default 235)."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "waiting",
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "step": "S1-10",
+    "key": "id_checked",
+    "keyOnFile": false
+  }
+}
