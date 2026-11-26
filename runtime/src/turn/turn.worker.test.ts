@@ -11,8 +11,11 @@ import closestEntriesFixture from "../../../contracts/tool-api/fixtures/closest-
 import commitLimit4 from "../../../contracts/tool-api/fixtures/commit-limit-4-changed.json";
 import commitLimit6First from "../../../contracts/tool-api/fixtures/commit-limit-6-reread-first.json";
 import commitLimit6Fails from "../../../contracts/tool-api/fixtures/commit-limit-6-value-fails.json";
+import commitRefused from "../../../contracts/tool-api/fixtures/commit-s1-02-refused-step-not-in-bundle.json";
 import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
+import commitNotBuilt from "../../../contracts/tool-api/fixtures/commit-s1-04-not-built.json";
 import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.json";
+import parkTurnSamRefused from "../../../contracts/data-access/fixtures/park-turn-sam-refused-at-once.json";
 import pollVote from "../../../contracts/inbound-event/fixtures/poll-vote.json";
 import decideDisagree from "../../../contracts/model/fixtures/decide-reads-disagree.json";
 import decideNoneFits from "../../../contracts/model/fixtures/decide-none-fits.json";
@@ -21,7 +24,7 @@ import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-w
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
 import safetyThreat from "../../../contracts/model/fixtures/safety-threat.json";
 import safetyTimeoutDangerWord from "../../../contracts/model/fixtures/safety-timeout-danger-word.json";
-import type { CommitContext, InboxEntry, LeasedTurn } from "../actor";
+import type { CommitContext, InboxEntry, LeasedTurn, ParkingTurn } from "../actor";
 import { BUNDLE_A, BUNDLE_B, WHOLE_A, WHOLE_B } from "../bundle/test-support";
 import { prepareHandoff, type HandleRef, type InboundEvent } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
@@ -30,7 +33,8 @@ import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER, type FakeRow } from "..
 import { fakeTargets } from "../guard/test-support";
 import type { SafetyResult } from "../safety/types";
 import { spanProblems, type BundleId } from "../trace";
-import { KEYWORD_RUNS, runTurnLoop, setTurnDeps, turnReplyCore, type TurnOutcome } from "./index";
+import { KEYWORD_RUNS, runTurnLoop, setTurnDeps, turnHooks, turnReplyCore, type TurnOutcome } from "./index";
+import { PASSED_ON_LINE, parkedRowId } from "./park";
 import {
   ALEX,
   BEN,
@@ -44,6 +48,7 @@ import {
   decided,
   fakeDecide,
   fakeFacts,
+  fakeReply,
   fakeTurnFace,
   safetyNoFor,
   storedText,
@@ -52,11 +57,18 @@ import {
   turnDeps,
   type FakeDecide,
   type FakeFacts,
+  type FakeReply,
   type FakeTurnFace,
   type TestTurn,
   type TextSpec,
 } from "./test-support";
-import type { DecideResult, GateAndCommitRequest, TurnParty } from "./types";
+import type {
+  DecideResult,
+  GateAndCommitRequest,
+  ParkTurnLineRequest,
+  ParkTurnRequest,
+  TurnParty,
+} from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -77,6 +89,8 @@ interface Setup {
   face: FakeTurnFace;
   ai: FakeDecide;
   facts: FakeFacts;
+  /** The second half's doubles: K-05's rows (its parkTurn among them) and the dispatcher, logging into the face's log. */
+  reply: FakeReply;
 }
 
 /**
@@ -110,9 +124,10 @@ async function setUp(spec: {
   });
   const face = fakeTurnFace();
   const ai = fakeDecide(face.log);
+  const reply = fakeReply();
   const facts = fakeFacts(spec.who.party, spec.times);
   for (const text of spec.texts) facts.safety.set(text.eventId, safetyNoFor(text.eventId));
-  restores.push(setTurnDeps(turnDeps(facts, face, ai, keys)));
+  restores.push(setTurnDeps(turnDeps(facts, face, ai, keys, reply)));
   const targets = fakeTargets();
   targets.answers.set(
     spec.who.party.handleId,
@@ -122,7 +137,7 @@ async function setUp(spec: {
     ),
   );
   restores.push(setGuardDeps({ targets: targets.port }));
-  return { t, face, ai, facts };
+  return { t, face, ai, facts, reply };
 }
 
 /**
@@ -174,14 +189,15 @@ async function setUpEntries(spec: {
   });
   const face = fakeTurnFace();
   const ai = fakeDecide(face.log);
+  const reply = fakeReply();
   const facts = fakeFacts(spec.who.party, spec.times);
   for (const entry of spec.entries) facts.safety.set(entry.event.eventId, safetyNoFor(entry.event.eventId));
-  restores.push(setTurnDeps(turnDeps(facts, face, ai, keys)));
+  restores.push(setTurnDeps(turnDeps(facts, face, ai, keys, reply)));
   const targets = fakeTargets();
   const { handleId } = spec.who.party;
   targets.answers.set(handleId, targetsAnswer(handleId, { roles: [], openQuestionIds: [], bookingIds: [] }));
   restores.push(setGuardDeps({ targets: targets.port }));
-  return { t, face, ai, facts };
+  return { t, face, ai, facts, reply };
 }
 
 function committed(outcome: TurnOutcome): Extract<TurnOutcome, { result: "committed" }> {
@@ -1894,36 +1910,56 @@ describe("a STOP read as danger is still recorded: a keyword turn committed with
     }
   });
 
-  it("unchanged: HELP read as danger, and START read as danger, with no stop word in the turn keep DL-864 note 2's answer: each core-only commit carries the danger record first, the keyword door answers notBuilt, and nothing is written", async () => {
+  it("HELP read as danger, and START read as danger, with no stop word in the turn keep DL-864 note 2's answer: the core-only commit carries the danger record first, the keyword door answers notBuilt, and nothing is written; that notBuilt is final (K-09 v1.13 default 219), so no second commit goes and the turn is parked at once with the passedOn line (default 218; 'Who reads v1.13', the runtime engineer's note a)", async () => {
     for (const text of [HELP, START]) {
       const danger = readAs(safetyEmergencyNow, text.eventId);
-      const { t, face, core } = await benRun([text], { [text.eventId]: danger });
+      const { t, face, core, reply } = await benRun([text], { [text.eventId]: danger });
 
       const outcome = await runTurnLoop(t.turn);
 
+      const reason = { from: "toolApi", fault: "notBuilt", ids: ["gateAndCommit"] };
       expect(outcome, text.body).toMatchObject({
         result: "notCommitted",
         why: "notRecorded",
-        gateCalls: KEYWORD_RUNS,
+        gateCalls: 1,
+        parkedAtOnce: { reason, answer: { result: "parked", repeated: false } },
       });
+      expect("aiDown" in outcome, text.body).toBe(false);
       const own =
         text === HELP ? ["sendFixedLine", "helpReply"] : ["recordStopOrStart", "start", text.eventId];
-      for (const request of requestsOf(face)) {
-        expect(request.caller.businessId, text.body).toBeNull();
-        expect(callsOf(request), text.body).toEqual([["recordSafetyOutcome", text.eventId], own]);
-      }
+      // One core-only commit: the replies run no second one after the final answer.
+      expect(requestsOf(face), text.body).toHaveLength(1);
+      const request = requestsOf(face)[0];
+      expect(request?.caller.businessId, text.body).toBeNull();
+      expect(callsOf(request), text.body).toEqual([["recordSafetyOutcome", text.eventId], own]);
+      // The door's one answer, then the lease told the turn is parked, with no call (K-05 commitTurn's turnParked).
       expect(
         t.commits.map((sent) => sent.answer),
         text.body,
-      ).toEqual(Array<unknown>(KEYWORD_RUNS).fill({ error: "notBuilt", call: "gateAndCommit" }));
+      ).toEqual([
+        { error: "notBuilt", call: "gateAndCommit" },
+        { error: "turnParked", turnId: "turn-ben-stop", parkedAt: stopRecorded.request.now },
+      ]);
       expect(
-        outcome.replies?.replies.map((reply) => [reply.outcome, reply.errorCode]),
+        outcome.replies?.replies.map((one) => [one.outcome, one.errorCode]),
         text.body,
       ).toEqual([["notRecorded", "notBuilt"]]);
-      // Nothing written: the shared core behind the door never ran.
+      // Nothing written by the commit: the shared core behind the door never ran.
       expect(core.commits, text.body).toEqual([]);
       expect(core.consents, text.body).toEqual([]);
       expect(core.outbox.size, text.body).toBe(0);
+      // The park: Ben's turn on try 1, the notBuilt reason, the passedOn line's row to Ben's own handle alone.
+      expect(reply.rows.parks, text.body).toHaveLength(1);
+      expect(reply.rows.parks[0], text.body).toMatchObject({
+        turn: { id: "turn-ben-stop", handleId: "handle-ben", tries: 1 },
+        reason,
+        outboxRows: [
+          { id: "out-turn-ben-stop-parked", recipientHandleId: "handle-ben", sendClass: "quick_reply" },
+        ],
+      });
+      expect(reply.dispatcher.wakes, text.body).toEqual([
+        { turnId: "turn-ben-stop", handleId: "handle-ben", outboxRowIds: ["out-turn-ben-stop-parked"] },
+      ]);
       expect(t.replied.count, text.body).toBe(0);
       restoreAll();
     }
@@ -2000,5 +2036,439 @@ describe("a STOP read as danger is still recorded: a keyword turn committed with
       expect(core.phones.get(SAM_PHONE)?.stopped, label).toBe(texts.length === 2);
       restoreAll();
     }
+  });
+});
+
+describe("a final answer before the commit parks the turn at once (K-09 v1.13 default 218; T-1529's ruling cards 6 and 7; T-1552)", () => {
+  const TURN = commitS102.request.turn.id;
+  const SAM_PHONE = "+15555550100";
+  const PARKED_AT = parkTurnSamRefused.request.parkedAt;
+  /** commit-s1-02-refused-step-not-in-bundle.json's answer, as K-05 v1.23 parks with it (default 216, field for field). */
+  const REFUSED = {
+    from: commitRefused.outcome.from,
+    fault: commitRefused.outcome.fault,
+    ids: [...commitRefused.outcome.ids],
+  };
+
+  const restoreAll = (): void => {
+    restores.splice(0).forEach((restore) => {
+      restore();
+    });
+  };
+
+  /**
+   * park-turn-sam-refused-at-once.json's request for this run's turn (its ids, texts, trace, pinned bundle and try), with
+   * `reason` as its reason and its entry's why: the passedOn line's one row to Sam's own handle.
+   */
+  function samPark(tries: number, reason: typeof REFUSED, parkedAt = PARKED_AT): ParkTurnRequest {
+    const fixture = parkTurnSamRefused.request;
+    const request = JSON.parse(
+      JSON.stringify(fixture).replaceAll(fixture.turn.id, TURN),
+    ) as ParkTurnLineRequest;
+    return {
+      ...request,
+      turn: {
+        ...request.turn,
+        eventIds: [S1_02_TEXT.eventId],
+        traceId: commitS102.request.turn.traceId,
+        bundleId: BUNDLE_A,
+        tries,
+      },
+      parkedAt,
+      reason,
+      events: request.events.map((entry) => ({
+        ...entry,
+        newValues: { state: "parked", tries },
+        why: { refused: reason },
+      })),
+    };
+  }
+
+  /** Sam's answer to S1-02 on this try: the frontier and decide answer their fixtures; the gate is each test's. */
+  async function samRun(): Promise<Setup> {
+    const setup = await setUp({
+      who: SAM,
+      turnId: TURN,
+      traceId: commitS102.request.turn.traceId,
+      texts: [S1_02_TEXT],
+      times: [buildFrontierS102.request.now, commitS102.request.now, PARKED_AT],
+      targets: SAM_S1_02_TARGETS,
+    });
+    setup.face.frontier = () => structuredClone(buildFrontierS102.outcome);
+    setup.ai.decide = () => decided(decideS102);
+    return setup;
+  }
+
+  /**
+   * Sam's answer to S1-02 beside his keyword text `word`: the decided request answers turnRefused; a core-only request goes
+   * to T-267's shared-core double over Sam's phone, as stop-recorded.json answers its records.
+   */
+  async function besideKeyword(
+    word: "STOP" | "START" | "HELP",
+  ): Promise<Setup & { core: ReturnType<typeof fakeReplyCore> }> {
+    const setup = await setUp({
+      who: SAM,
+      turnId: TURN,
+      traceId: commitS102.request.turn.traceId,
+      texts: [S1_02_TEXT, { eventId: "evt-sam-0003", body: word, sentAt: "2026-10-19T14:05:02Z" }],
+      times: [buildFrontierS102.request.now, commitS102.request.now],
+      targets: SAM_S1_02_TARGETS,
+    });
+    setup.face.frontier = () => structuredClone(buildFrontierS102.outcome);
+    setup.ai.decide = () => decided(decideS102);
+    const core = fakeReplyCore(commitS102.request.now, [phone(SAM_PHONE, "handle-sam", "person-sam", 3)]);
+    setup.face.gate = async (request) => {
+      if (request.input.kind === "decided") return structuredClone(commitRefused.outcome);
+      const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
+      const answer = await core.core.commitCore({
+        caller: request.caller as never,
+        actions: request.core.slice(records.length) as never,
+      });
+      if ("error" in answer) return answer;
+      return {
+        result: "committed",
+        turnId: request.turn.id,
+        committedAt: request.now,
+        repeated: answer.repeated,
+        parts: [],
+        planner: null,
+        core: [...records.map(() => structuredClone(stopRecorded.outcome.core[0])), ...answer.core],
+        written: {
+          written: [],
+          outboxRows: [...core.outbox.values()].map((row) => ({ id: row.id, commitSeq: row.commitSeq })),
+          promoted: [],
+        },
+        effects: [],
+        openQuestions: { opened: [], closed: [] },
+      } as never;
+    };
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+    return { ...setup, core };
+  }
+
+  /** Each answer the lease's commit gave the run, by its error code ("committed" for a commit). */
+  const answersOf = (t: TestTurn): string[] =>
+    t.commits.map((sent) => ("error" in sent.answer ? sent.answer.error : "committed"));
+
+  it("gateAndCommit's turnRefused (commit-s1-02-refused-step-not-in-bundle.json's answer) on try 1 is never sent again: the turn is parked at once with its labels as the reason and one passedOn row to the turn's own handle (park-turn-sam-refused-at-once.json), the dispatcher is woken once and the lease is told the turn is parked", async () => {
+    const { t, face, ai, reply } = await samRun();
+    face.gate = answersInTurn(commitRefused.outcome);
+
+    const outcome = await runTurnLoop(t.turn);
+
+    // One gateAndCommit, as the decided turn sends it: no resend, no re-read, no second call.
+    expect(requestsOf(face)).toEqual([commitS102.request]);
+    expect(ai.rereadCalls).toEqual([]);
+    expect(face.log).toEqual(["frontier", "decide", "gate", "gate:answered"]);
+    expect(outcome).toEqual({
+      result: "notCommitted",
+      why: "turnRefused",
+      gateCalls: 1,
+      replies: null,
+      parkedAtOnce: { reason: REFUSED, answer: { result: "parked", parkedAt: PARKED_AT, repeated: false } },
+    });
+    // The park: park-turn-sam-refused-at-once.json's request for this turn, on try 1, with the refusal's labels.
+    expect(reply.rows.parks).toEqual([samPark(1, REFUSED)]);
+    const [row] = (reply.rows.parks[0] as ParkTurnLineRequest).outboxRows;
+    expect(row.recipientHandleId).toBe(commitS102.request.turn.handleId);
+    expect(row.finalParts.sends).toEqual([
+      { kind: "words", text: PASSED_ON_LINE, calendarFile: "none", options: [], link: null },
+    ]);
+    expect(row.finalParts.fixedLines).toEqual(["passedOn"]);
+    // The dispatcher woken once for the line's row; the lease told the turn is parked, with no call.
+    expect(reply.dispatcher.wakes).toEqual([
+      { turnId: TURN, handleId: "handle-sam", outboxRowIds: [parkedRowId(TURN)] },
+    ]);
+    expect(t.commits.map((sent) => sent.answer)).toEqual([
+      commitRefused.outcome,
+      { error: "turnParked", turnId: TURN, parkedAt: PARKED_AT },
+    ]);
+    expect(t.replied.count).toBe(0);
+    // Labels, ids and counts only in the spans: never the text's words, the line's words or the number.
+    expect(t.spans.map((span) => span.hop)).toEqual([
+      "guard",
+      "frontier",
+      "decideReads",
+      "gate",
+      "commit",
+      "lease",
+    ]);
+    for (const span of t.spans) expect(spanProblems(span)).toEqual([]);
+    expect(t.spans.find((span) => span.hop === "commit")).toMatchObject({
+      outcome: "refused",
+      error_code: "turnRefused",
+    });
+    expect(t.spans.at(-1)?.decided).toEqual({
+      parked: true,
+      atOnce: true,
+      from: "walk",
+      fault: "stepNotInBundle",
+      ids: ["S1-04"],
+      repeated: false,
+      woken: true,
+      sends: 1,
+    });
+    const logged = JSON.stringify(t.spans);
+    for (const words of [S1_02_TEXT.body, PASSED_ON_LINE, "passed this on", SAM_PHONE]) {
+      expect(logged).not.toContain(words);
+    }
+  });
+
+  it("on try 2 or 3 (a rerun after crashes) the turn is parked on the try the lease counted, with the same reason and line", async () => {
+    for (const tries of [2, 3]) {
+      const { t, face, reply } = await samRun();
+      face.gate = answersInTurn(commitRefused.outcome);
+      const turn: LeasedTurn = { ...t.turn, tries };
+
+      const outcome = await runTurnLoop(turn);
+
+      expect(
+        requestsOf(face).map((request) => request.turn.tries),
+        String(tries),
+      ).toEqual([tries]);
+      expect(outcome, String(tries)).toMatchObject({
+        why: "turnRefused",
+        parkedAtOnce: { reason: REFUSED, answer: { result: "parked", repeated: false } },
+      });
+      expect(reply.rows.parks, String(tries)).toEqual([samPark(tries, REFUSED)]);
+      expect(answersOf(t), String(tries)).toEqual(["turnRefused", "turnParked"]);
+      restoreAll();
+    }
+  });
+
+  it("notBuilt from gateAndCommit (commit-s1-04-not-built.json's answer) parks at once with {toolApi, notBuilt, [gateAndCommit]}; notBuilt from buildFrontier parks with [buildFrontier], and nothing goes to decide or the gate", async () => {
+    const atGate = await samRun();
+    atGate.face.gate = answersInTurn(commitNotBuilt.outcome);
+    const gated = await runTurnLoop(atGate.t.turn);
+    const gateReason = { from: "toolApi", fault: "notBuilt", ids: ["gateAndCommit"] };
+    expect(atGate.face.gateCalls).toHaveLength(1);
+    expect(gated).toMatchObject({
+      why: "notBuilt",
+      gateCalls: 1,
+      parkedAtOnce: { reason: gateReason, answer: { result: "parked" } },
+    });
+    expect(atGate.reply.rows.parks).toEqual([samPark(1, gateReason)]);
+    expect(answersOf(atGate.t)).toEqual(["notBuilt", "turnParked"]);
+    restoreAll();
+
+    const atFrontier = await samRun();
+    atFrontier.face.frontier = () => ({ error: "notBuilt", call: "buildFrontier" });
+    const fronted = await runTurnLoop(atFrontier.t.turn);
+    const frontierReason = { from: "toolApi", fault: "notBuilt", ids: ["buildFrontier"] };
+    expect(atFrontier.ai.decideCalls).toEqual([]);
+    expect(atFrontier.face.gateCalls).toEqual([]);
+    expect(fronted).toMatchObject({
+      why: "notBuilt",
+      gateCalls: 0,
+      parkedAtOnce: { reason: frontierReason, answer: { result: "parked" } },
+    });
+    // The park is the run's next K-09-dated call: its time is the clock's second value.
+    expect(atFrontier.reply.rows.parks).toEqual([samPark(1, frontierReason, commitS102.request.now)]);
+    expect(answersOf(atFrontier.t)).toEqual(["turnParked"]);
+  });
+
+  it("a transient answer is retried as today (one resend, then the lease's rerun), and a refusal that is not final, or a turnRefused whose labels are words, keeps today's path: nothing is parked", async () => {
+    const cases: { answer: Record<string, unknown>; why: string; calls: number }[] = [
+      { answer: { error: "transient", sqlstate: "40001" }, why: "transient", calls: 2 },
+      {
+        answer: { error: "versionChanged", table: "clock_rows", rowId: "clock-s1-02-sam" },
+        why: "versionChanged",
+        calls: 1,
+      },
+      {
+        answer: { error: "turnRefused", from: "walk", fault: "step not in bundle", ids: ["S1-04"] },
+        why: "turnRefused",
+        calls: 1,
+      },
+    ];
+    for (const { answer, why, calls } of cases) {
+      const { t, face, reply } = await samRun();
+      face.gate = answersInTurn(answer);
+
+      const outcome = await runTurnLoop(t.turn);
+
+      expect(outcome, why).toEqual({ result: "notCommitted", why, gateCalls: calls, replies: null });
+      expect(requestsOf(face), why).toEqual(Array<unknown>(calls).fill(commitS102.request));
+      expect(reply.rows.parks, why).toEqual([]);
+      expect(reply.dispatcher.wakes, why).toEqual([]);
+      expect(answersOf(t), why).toEqual(Array<string>(calls).fill(why));
+      restoreAll();
+    }
+  });
+
+  it("a turnRefused's ids reach the park each once, labels only (K-09 v1.13 default 216), and the same labels are the entry's why", async () => {
+    const { t, face, reply } = await samRun();
+    face.gate = answersInTurn({
+      error: "turnRefused",
+      from: "companies",
+      fault: "secondCompany",
+      ids: ["S1-04", "S1-04", SAM_PHONE, "two words", "S1-08"],
+    });
+
+    const outcome = await runTurnLoop(t.turn);
+
+    const reason = { from: "companies", fault: "secondCompany", ids: ["S1-04", "S1-08"] };
+    expect(outcome).toMatchObject({ parkedAtOnce: { reason, answer: { result: "parked" } } });
+    expect(reply.rows.parks).toEqual([samPark(1, reason)]);
+    expect(JSON.stringify(reply.rows.parks)).not.toContain(SAM_PHONE);
+  });
+
+  it("a STOP's core-only commit stands before any park: a decided text and a STOP whose decided request answers turnRefused commit the STOP core-only on that run, under the caller of every business, and nothing is parked (DL-508, DL-521)", async () => {
+    const { t, face, reply, core } = await besideKeyword("STOP");
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    expect(requestsOf(face).map((request) => request.input.kind)).toEqual(["decided", "coreOnly"]);
+    expect(requestsOf(face)[1]?.caller.businessId).toBeNull();
+    expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+    expect(outcome.replies?.replies.map((one) => [one.outcome, one.line, one.stopped])).toEqual([
+      ["replied", "stopReply", true],
+    ]);
+    expect(answersOf(t)).toEqual(["turnRefused", "committed"]);
+    expect(reply.rows.parks).toEqual([]);
+    expect(t.replied.count).toBe(1);
+  });
+
+  it("a STOP whose core-only commit does not commit either is never parked at once: it keeps today's path, the lease's rerun, and no passedOn line is written", async () => {
+    const setup = await besideKeyword("STOP");
+    const refusing = setup.face.gate;
+    setup.face.gate = (request, index) =>
+      request.input.kind === "decided" && refusing !== null
+        ? refusing(request, index)
+        : { error: "transient", sqlstate: "40001" };
+
+    const outcome = await runTurnLoop(setup.t.turn);
+
+    expect(outcome).toMatchObject({ result: "notCommitted", why: "notRecorded" });
+    expect("parkedAtOnce" in outcome).toBe(false);
+    const kinds = requestsOf(setup.face).map((request) => request.input.kind);
+    expect(kinds[0]).toBe("decided");
+    expect(kinds.slice(1).length).toBeGreaterThan(0);
+    expect(kinds.slice(1).every((kind) => kind === "coreOnly")).toBe(true);
+    expect(setup.reply.rows.parks).toEqual([]);
+    expect(answersOf(setup.t)).not.toContain("turnParked");
+  });
+
+  /** What the lease's crash park is handed for this run's turn (../actor ParkingTurn), as lease.ts builds it. */
+  const parkingOf = (turn: LeasedTurn): ParkingTurn => ({
+    turnId: turn.turnId,
+    eventIds: [...turn.eventIds],
+    entries: turn.entries,
+    traceId: turn.traceId,
+    joinedTraceIds: [...turn.joinedTraceIds],
+    tries: turn.tries,
+    bundleId: turn.bundleId,
+    trace: turn.trace,
+  });
+
+  /** A row with its plan and final parts left out: v1's outboxRowNew (park-turn.json's row). */
+  const withoutWords = (row: object): Record<string, unknown> =>
+    Object.fromEntries(Object.entries(row).filter(([key]) => key !== "plan" && key !== "finalParts"));
+
+  it("that STOP turn's third try ends with its STOP not committed, and the lease's crash park (turnHooks.park) parks it in v1's form with its row unworded: no passedOn line to a number whose STOP is in the turn (K-09 v1.13 default 218; DL-1211); a turn with no stop word, crashed the same way, still gets the line", async () => {
+    const setup = await besideKeyword("STOP");
+    const refusing = setup.face.gate;
+    setup.face.gate = (request, index) =>
+      request.input.kind === "decided" && refusing !== null
+        ? refusing(request, index)
+        : { error: "transient", sqlstate: "40001" };
+    const third: LeasedTurn = { ...setup.t.turn, tries: 3 };
+
+    const outcome = await runTurnLoop(third);
+    expect(outcome).toMatchObject({ result: "notCommitted", why: "notRecorded" });
+    expect(setup.core.phones.get(SAM_PHONE)?.stopped).toBe(false);
+    expect(setup.reply.rows.parks).toEqual([]);
+
+    // The third lapse with no commit: the lease's park hook.
+    const parkedAt = commitS102.request.now;
+    expect(await turnHooks.park(parkingOf(third))).toEqual({ result: "parked", parkedAt, repeated: false });
+
+    const lineForm = samPark(3, REFUSED, parkedAt) as ParkTurnLineRequest;
+    const eventIds = [S1_02_TEXT.eventId, "evt-sam-0003"];
+    expect(setup.reply.rows.parks).toEqual([
+      {
+        turn: { ...lineForm.turn, eventIds },
+        parkedAt,
+        outboxRows: [withoutWords(lineForm.outboxRows[0])],
+        events: lineForm.events.map((entry) => ({
+          ...entry,
+          why: { outage: "third crash before the commit" },
+        })),
+      },
+    ]);
+    const sent = JSON.stringify(setup.reply.rows.parks);
+    for (const words of [PASSED_ON_LINE, "passedOn", "STOP", S1_02_TEXT.body])
+      expect(sent).not.toContain(words);
+    expect(setup.reply.dispatcher.wakes).toEqual([
+      { turnId: TURN, handleId: "handle-sam", outboxRowIds: [parkedRowId(TURN)] },
+    ]);
+    expect(setup.t.spans.at(-1)?.decided).toMatchObject({ parked: true, atOnce: false, line: false });
+    restoreAll();
+
+    // The same crash with no stop word in the turn: the crash park's row carries the passedOn line (card 7).
+    const plain = await samRun();
+    plain.face.gate = answersInTurn({ error: "transient", sqlstate: "40001" });
+    const plainThird: LeasedTurn = { ...plain.t.turn, tries: 3 };
+    expect(await runTurnLoop(plainThird)).toMatchObject({ result: "notCommitted", why: "transient" });
+    expect(await turnHooks.park(parkingOf(plainThird))).toMatchObject({ result: "parked", repeated: false });
+    const [parked] = plain.reply.rows.parks;
+    const plainForm = samPark(3, REFUSED, PARKED_AT) as ParkTurnLineRequest;
+    expect(plain.reply.rows.parks).toEqual([
+      {
+        turn: plainForm.turn,
+        parkedAt: PARKED_AT,
+        outboxRows: plainForm.outboxRows,
+        events: plainForm.events.map((entry) => ({
+          ...entry,
+          why: { outage: "third crash before the commit" },
+        })),
+      },
+    ]);
+    expect((parked as ParkTurnLineRequest).outboxRows[0].finalParts.sends).toEqual([
+      { kind: "words", text: PASSED_ON_LINE, calendarFile: "none", options: [], link: null },
+    ]);
+    expect(plain.t.spans.at(-1)?.decided).toMatchObject({ parked: true, atOnce: false, line: true });
+  });
+
+  it("HELP or START beside a decided text whose decided request answers turnRefused: one gateAndCommit, none on the replies' reruns, then the turn is parked at once", async () => {
+    for (const word of ["HELP", "START"] as const) {
+      const { t, face, reply } = await besideKeyword(word);
+
+      const outcome = await runTurnLoop(t.turn);
+
+      expect(requestsOf(face), word).toHaveLength(1);
+      expect(requestsOf(face)[0]?.input, word).toEqual(commitS102.request.input);
+      expect(outcome, word).toMatchObject({
+        result: "notCommitted",
+        gateCalls: 1,
+        parkedAtOnce: { reason: REFUSED, answer: { result: "parked", repeated: false } },
+      });
+      expect(reply.rows.parks, word).toHaveLength(1);
+      expect(reply.rows.parks[0], word).toMatchObject({ reason: REFUSED, turn: { id: TURN, tries: 1 } });
+      expect(answersOf(t), word).toEqual(["turnRefused", "turnParked"]);
+      restoreAll();
+    }
+  });
+
+  it("a run no longer the turn's parks nothing (the run that has the turn now does), and a park K-05 cannot take now leaves the turn to the lease's rerun, the lease not told", async () => {
+    const gone = await samRun();
+    gone.face.gate = () => {
+      gone.t.abort();
+      return structuredClone(commitRefused.outcome);
+    };
+    const ended = await runTurnLoop(gone.t.turn);
+    expect(ended).toEqual({ result: "notCommitted", why: "turnRefused", gateCalls: 1, replies: null });
+    expect(gone.reply.rows.parks).toEqual([]);
+    expect(answersOf(gone.t)).toEqual(["turnRefused"]);
+    restoreAll();
+
+    const busy = await samRun();
+    busy.face.gate = answersInTurn(commitRefused.outcome);
+    busy.reply.rows.park = () => ({ error: "transient", sqlstate: "40001" });
+    const notDone = await runTurnLoop(busy.t.turn);
+    expect(notDone).toMatchObject({ parkedAtOnce: { reason: REFUSED, answer: { error: "transient" } } });
+    expect(busy.reply.rows.parks).toHaveLength(2);
+    expect(busy.reply.dispatcher.wakes).toEqual([]);
+    expect(answersOf(busy.t)).toEqual(["turnRefused"]);
   });
 });
