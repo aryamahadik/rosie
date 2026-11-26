@@ -2,9 +2,44 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 920, [`d4fabf68`](https://github.com/aryamahadik/rosie/commit/d4fabf68), 2026-11-23 09:16:29 UTC.
+- **Through:** commit 922, [`b2169f75`](https://github.com/aryamahadik/rosie/commit/b2169f75), 2026-11-23 11:33:45 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 922. docs: COMMIT\_HISTORY.md through commit 920 (d4fabf68, \#937) (\#939)
+
+- **Commit:** [`b2169f75`](https://github.com/aryamahadik/rosie/commit/b2169f75), by Arya Mahadik, 2026-11-23 11:33:45 UTC
+- **Pull request:** [#939](https://github.com/aryamahadik/rosie/pull/939) from `task/commit-history-242`, merged 2026-11-23 11:33:45 UTC. It squashed 1 branch commit:
+  - `f829c53` docs: COMMIT\_HISTORY.md through commit 920 (d4fabf68, \#937)
+- **Files changed:** 1 (+56 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +56 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 921. T-321: staff status, admins' powers over K-22 team rows, and the ID upload as the ID confirmed (C10) (\#938)
+
+- **Commit:** [`402f71b8`](https://github.com/aryamahadik/rosie/commit/402f71b8), by Arya Mahadik, 2026-11-23 11:33:40 UTC
+- **Pull request:** [#938](https://github.com/aryamahadik/rosie/pull/938) from `task/T-321`, merged 2026-11-23 11:33:41 UTC. It squashed 1 branch commit:
+  - `347a577` T-321: staff status, admins' powers over K-22 team rows, and the ID u…
+- **Files changed:** 8 (+1728 −0), by folder:
+  - `actions/src/domain/identity-access/id-upload/` id-upload.test.ts +362 −0, id-upload.ts +353 −0, index.ts +29 −0, test-support.ts +181 −0
+  - `actions/src/domain/identity-access/staff/` index.ts +20 −0, staff.test.ts +330 −0, staff.ts +278 −0, test-support.ts +175 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+staff/: createStaffAccess reads K-22 v1 staff and team_powers by business (invited, joined, stopped, removed; only a joined member with the owner's yes is offered; live powers with the price amount), and teamAdminPowers gives the T-308 base its AdminPowers port. id-upload/: createIdUploadAccess answers idConfirmed (a sign_up upload, C10), idReChecked (the S13-45 row 8 second proof) and confirmUpload (K-13 checkUpload stored, then the id_uploads row the commit writes, giving id_checked); no face match, selfie or video port; nothing logged.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 920. docs: COMMIT\_HISTORY.md through commit 917 (98a0d99f, \#935) (\#937)
 
