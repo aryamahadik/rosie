@@ -2,9 +2,128 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 929, [`12c7067b`](https://github.com/aryamahadik/rosie/commit/12c7067b), 2026-11-26 06:07:51 UTC.
+- **Through:** commit 933, [`bf628f8f`](https://github.com/aryamahadik/rosie/commit/bf628f8f), 2026-11-26 09:42:40 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 933. docs: COMMIT\_HISTORY.md through commit 929 (12c7067b, \#946) (\#951)
+
+- **Commit:** [`bf628f8f`](https://github.com/aryamahadik/rosie/commit/bf628f8f), by Arya Mahadik, 2026-11-26 09:42:40 UTC
+- **Pull request:** [#951](https://github.com/aryamahadik/rosie/pull/951) from `task/commit-history-245`, merged 2026-11-26 09:42:41 UTC. It squashed 1 branch commit:
+  - `a52ab7a` docs: COMMIT\_HISTORY.md through commit 929 (12c7067b, \#946)
+- **Files changed:** 1 (+143 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +143 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 932. T-1544: K-01 v1.1, the stop field (asksByWords, waitsOnEvent) (\#949)
+
+- **Commit:** [`4639552b`](https://github.com/aryamahadik/rosie/commit/4639552b), by Arya Mahadik, 2026-11-26 09:42:36 UTC
+- **Pull request:** [#949](https://github.com/aryamahadik/rosie/pull/949) from `task/T-1544`, merged 2026-11-26 09:42:36 UTC. It squashed 4 branch commits:
+  - `d6b31f9` T-1544: K-01 v1.1, the optional step field stop (asksByWords, waitsOn…
+  - `dbee8bb` T-1544: K-01 v1.1 fixtures for S1-23 (asksByWords with a typed field;…
+  - `c04debd` T-1544: bundle.v1.test.ts and emit/validate.test.ts select K-01 v1's …
+  - `4e06ce1` T-1544: K-01 v1.1 round 3 (Lead note 2, DL-1209): the stop rule reads…
+- **Files changed:** 19 (+6888 −11), by folder:
+  - `compiler/src/emit/` validate.test.ts +9 −4
+  - `contracts/bundle/` README.md +80 −2, bundle.v1.1.schema.json +1625 −0, frozen.json +1 −1
+  - `contracts/bundle/fixtures/` flow-a-v3-with-stops.json +3771 −0, index.json +104 −0, stop-ask-s1-12-read-back.json +136 −0, stop-ask-s1-23.json +64 −0, stop-ask-s1-77.json +111 −0, stop-wait-s1-10.json +107 −0
+  - `contracts/bundle/fixtures/invalid/` refuse-ask-at-event-step.json +105 −0, refuse-ask-choice-field.json +64 −0, refuse-ask-line-zero-button.json +140 −0, refuse-stop-both-kinds.json +116 −0, refuse-stop-on-buttons-step.json +63 −0, refuse-stop-on-split.json +158 −0, refuse-wait-key-not-given.json +113 −0, refuse-wait-unknown-key.json +107 −0
+  - `tests/contract/` bundle.v1.test.ts +14 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1544: K-01 v1.1, the optional step field stop (asksByWords, waitsOnEvent), its check, fixtures, README and freeze
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1544: K-01 v1.1 fixtures for S1-23 (asksByWords with a typed field; a choice field refused), README checks for S1-12, S1-61, S1-21, S1-24, S1-29
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1544: bundle.v1.test.ts and emit/validate.test.ts select K-01 v1's entries of the shared fixtures index (DL-125, DL-153, DL-1196); no v1 assertion loosened
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1544: K-01 v1.1 round 3 (Lead note 2, DL-1209): the stop rule reads the ask, line 0; a later buttoned line from Rosie is a read-back that keeps the stop; the schema asks of an asking step a line from Rosie with no reply button on every path and of a waiting step none at all; fixtures stop-ask-s1-12-read-back and refuse-ask-line-zero-button; services typed text; README defaults 24, 26 restated, 27 and the S1-38/S2-27 open gap, the whole-build check over 486 compiled trade flows, the v1 tests no longer a NEED
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 931. T-1547: K-09 v1.14, the event turn and the walk's text-path rules (\#948)
+
+- **Commit:** [`128fa06c`](https://github.com/aryamahadik/rosie/commit/128fa06c), by Arya Mahadik, 2026-11-26 09:42:30 UTC
+- **Pull request:** [#948](https://github.com/aryamahadik/rosie/pull/948) from `task/T-1547`, merged 2026-11-26 09:42:31 UTC. It squashed 3 branch commits:
+  - `a31a164` T-1547: freeze K-09 v1.14, the event turn (input kind event, the even…
+  - `35c8a8f` T-1547: round 2 (DL-1210): default 224 restates waiting's sources, ea…
+  - `796338f` T-1547: round 3 (DL-1223): default 233 has an event turn name only Co…
+- **Files changed:** 16 (+1184 −5), by folder:
+  - `contracts/tool-api/` README.md +98 −3, frozen.json +2 −1, tool-api.rules.mjs +127 −0, tool-api.v1.14.schema.json +934 −0
+  - `contracts/tool-api/fixtures/` commit-event-control-not-waiting.json +1 −0, commit-event-control-proven.json +1 −0, commit-event-id-checked-held.json +1 −0, commit-event-id-checked-repeat.json +1 −0, commit-event-id-checked.json +1 −0, index.json +12 −1
+  - `contracts/tool-api/fixtures/invalid/` refuse-event-key-not-in-table.json +1 −0, refuse-event-other-handle.json +1 −0, refuse-event-repeat-other-values.json +1 −0, refuse-event-step-not-waiting.json +1 −0, refuse-event-step-outside-table.json +1 −0, refuse-event-with-texts.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1547: freeze K-09 v1.14, the event turn (input kind event, the event table gaining control_proven, waiting read from the key's own source and eventNotWaiting, the resume, the event start and owner lane, reach settlers, asks-by-words and owner-lane asks, the park and the reply), named rule eventTurn, 4 accepted and 6 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1547: round 2 (DL-1210): default 224 restates waiting's sources, each condition with the read that answers it; open gap 215 names the K-05 reads owed (a live page link by person, business and step; a review item by id with its decision and raised_by; the turn-committed read; a business's status), carded as T-1554; default 233 states the lead's hold ruling (the key's rows and record commit once, the walk obeys the hold, the event id marked done, the next turn that reaches the step walks on); default 234 (writers and settlers on an event turn, the zone); notes (a)-(e) and the runtime notes 1-4 answered; open gap 216; the security reviewer added
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1547: round 3 (DL-1223): default 233 has an event turn name only CommitContext's unread ids to readOpenHolds, never its own event id, and A11 takes openHoldsPort with a proof; new default 235, the resume start (the handle's next turn resumes a walk waiting at S1-10 or S1-32 whose key is now on file, a WalkStart of kind resume, the owner as writer, before the turn's decided parts, obeying the hold), answering open gap 216, its read open gap 215 (5) for T-1554; the ID link checked against the upload's own finished time; open gap 215 (2) widened to listing_match; default 209 restated; accepted fixture commit-event-id-checked-held.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 930. T-1555: decide-3, an id field's value is its words (backstop), S1-09's details span, T-1507's rules, an S1-09 eval slice (\#947)
+
+- **Commit:** [`67758b47`](https://github.com/aryamahadik/rosie/commit/67758b47), by Arya Mahadik, 2026-11-26 09:42:25 UTC
+- **Pull request:** [#947](https://github.com/aryamahadik/rosie/pull/947) from `task/T-1555`, merged 2026-11-26 09:42:25 UTC. It squashed 2 branch commits:
+  - `f02980b` T-1555: decide-3 beside decide-1 and decide-2 (rule b's whole-quote s…
+  - `bb37a5f` T-1555: the S1-09 eval slice (curly, straight and claim-first runbook…
+- **Files changed:** 9 (+1695 −10), by folder:
+  - `ai/src/decide/` id-words.test.ts +353 −0, id-words.ts +64 −0, index.ts +13 −2, prompt.test.ts +313 −0, prompt.ts +182 −4, read.ts +8 −4
+  - `evals/src/slices/s1-09/` run.mjs +204 −0, slice.test.ts +198 −0, slice.ts +360 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1555: decide-3 beside decide-1 and decide-2 (rule b's whole-quote span, S1-09's name-and-town span, rule c whatever the text says, rule d widened to id fields, examples 7 to 9) and the backstop: an id-typed field's value is set to its own words before reads are compared
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1555: the S1-09 eval slice (curly, straight and claim-first runbook texts on bundle v3 with decide-3; both reads agree, c-01, business words as typed, value = words, limit 6's id rule) with its unit test and its live runner
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 929. docs: COMMIT\_HISTORY.md through commit 924 (4d384466, \#941) (\#946)
 
@@ -20889,3 +21008,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#877](https://github.com/aryamahadik/rosie/pull/877) T-1493 (H1a): the turn face binds the one-kind path; "Plumbing" walks to S1-08's plan and S1-09's question, never S1-04 (DL-1075) (`task/T-1493`, 3 branch commits, closed 2026-11-22 04:06:28 UTC)
 - [#878](https://github.com/aryamahadik/rosie/pull/878) docs: COMMIT\_HISTORY.md through commit 861 (e5365c5b, \#875) (`task/commit-history-213`, 1 branch commit, closed 2026-11-22 01:58:02 UTC)
 - [#881](https://github.com/aryamahadik/rosie/pull/881) docs: COMMIT\_HISTORY.md through commit 863 (1b7127cb, \#879) (`task/commit-history-215`, 1 branch commit, closed 2026-11-22 03:31:24 UTC)
+- [#950](https://github.com/aryamahadik/rosie/pull/950) T-1557: README defaults from the Nov 23 phone test: id value = words, S1-09's span; none\_fits and asked-twice passed on (`task/T-1557`, 2 branch commits, closed 2026-11-26 09:48:44 UTC)
