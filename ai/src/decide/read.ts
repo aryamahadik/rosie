@@ -10,8 +10,9 @@
 //   3. Step 2, side by side, one call per part that is not no_op: the per-turn part ends with the parts step 1 found
 //      and <step n="2" part="k"></step>; the answer (the verb's own K-02 schema less verb and quote) is that part's
 //      fields. Each asks first the model that answered step 1, so a read stays on one model where it can.
-//   4. Code maps the two into K-02 v1's `decideRead` (map.ts) and validates it before it leaves the AI layer
-//      (check.ts): K-02's schema and the named rules optionOffered and quoteInText against the context.
+//   4. Code maps the two into K-02 v1's `decideRead` (map.ts), sets each id-typed field's value to its own words
+//      (id-words.ts, T-1555's backstop) and validates it before it leaves the AI layer (check.ts): K-02's schema and the
+//      named rules optionOffered and quoteInText against the context.
 //
 // The answer is K-02's `read`: which model read it (the one that answered step 1), in which role, and the output with
 // the text's language (CQ-07 default), or a typed refusal (an unmapped read: the turn's one re-read follows, arch 02
@@ -28,6 +29,7 @@ import { buildContextPrompt, drawSeed } from "../context";
 import { GatewayConfigError, type AttemptFailure, type GatewayEffort } from "../gateway";
 import { partRuleProblems, readProblems, ruleView } from "./check";
 import { DecideRequestError } from "./errors";
+import { idValuesAsWords } from "./id-words";
 import { mapPart, readStageOne } from "./map";
 import { stageOneTail, stageTwoTail } from "./prompt";
 import { STAGE1_SCHEMA, STAGE2_SCHEMAS } from "./schema";
@@ -158,8 +160,10 @@ export function createDecideReader(options: DecideReaderOptions): DecideReader {
       });
       if (problems.length > 0)
         return { ...base, status: "refused", stage: 2, problems, unmappedParts, modelCalls };
-      // The last gate before the read leaves the AI layer: the whole read against K-02's schema and the named rules.
-      const output: DecideRead = { language: head.language, parts };
+      // T-1555's backstop (DL-1214; K-09 README default 200): each id-typed field's value is its own words, before the
+      // read is compared with another (agree.ts) or reaches the gate. Then the last gate before the read leaves the AI
+      // layer: the whole read against K-02's schema and the named rules.
+      const output: DecideRead = idValuesAsWords(context, { language: head.language, parts });
       const final = readProblems(context, output);
       if (final.length > 0)
         return { ...base, status: "refused", stage: 2, problems: final, unmappedParts: [], modelCalls };
