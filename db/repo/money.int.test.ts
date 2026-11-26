@@ -774,7 +774,8 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
     // stay exact.
     // T-1473 (DL-1034's grant: a pin-only edit as T-1457 and T-1463 made): they gain 0039, and stay exact.
     // T-1553 (DL-1215's grant: a pin-only edit as T-1457, T-1463 and T-1473 made): they gain 0040, and stay exact.
-    expect(names.slice(-11)).toEqual([
+    // T-1574 (its card's May touch, as DL-1215 allowed: a pin-only edit): they gain 0043, and stay exact.
+    expect(names.slice(-12)).toEqual([
       "money_payments_ledger",
       "money_fees_packs",
       "core_outbox_no_turn",
@@ -786,6 +787,7 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
       "core_person_handles_linked",
       "core_outbox_step_line",
       "business_setup_claim",
+      "walk_waits",
     ]);
     for (const before of [
       "effects_provider_events",
