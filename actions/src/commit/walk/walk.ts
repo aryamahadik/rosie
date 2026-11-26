@@ -95,7 +95,7 @@
 //     answered (a step move whose `answered` is null: writes.ts closes its question and writes its gives and its later
 //     lines through its writer), then goes on from its next, as from any plain step walked.
 //   - the waiting-step starts (defaults 226, 234 (1) and 235; WalkStart "event" and "resume"): the start names the
-//     waiting step and its key, which must be a pair of the event table (else notWaitingStep). From a waiting plain step
+//     waiting step and its key, which must be a pair of the event table (else eventKeyAtWalk). From a waiting plain step
 //     (S1-10) the walk goes on from its next with no move of the step, so nothing of it is written again; at a waiting
 //     split (S1-32) it stops "reaches" again where a reach settler is bound (else as today, atSplit), and goes on from the
 //     branch the settler answers, or waits again (waitsOnEvent, nothing written). The step's own gate is not read again,
@@ -109,8 +109,12 @@
 //      stop" (R1) read as atSplit would make S1-32's "ask" notBuilt lookup instead, against default 225.
 //   7. "wait" and "ask" are reserved at every split, as settle.ts default 1 reserves "ask": no bundle holds a branch
 //      labelled either. "wait" at a split the event table does not list is a label that split lacks (settledNotInBundle).
-//   8. An event or resume start whose key and step are not a pair of the event table is refused (notWaitingStep, naming
-//      the step and the key), with nothing walked: the walk never starts past a step that does not wait on that key.
+//   8. An event or resume start whose key and step are not a pair of the event table is refused, with nothing walked:
+//      the walk never starts past a step that does not wait on that key. Its fault is eventKeyAtWalk, naming the step and
+//      the key alone: the walk's fault list is K-09 v1.13 default 217's, each classed in tool-api/refusal.ts (outside
+//      this card), so the start takes the event table's own final fault rather than a new one. (The gate never makes
+//      such a start: the event input pairs them, `refuse-event-step-outside-table.json`, and the resume reads the
+//      walk's own waiting step: A11.)
 //   9. A waits-on-event field names the keys it lists (K-01 v1.1 `eventKey`: id_checked), in its order; the table is
 //      read only for a step with no field, so a field's stop never falls back to the table.
 
@@ -446,7 +450,7 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart, options: Wal
    */
   const resume = (start: WaitingStart): Stop => {
     if (!EVENT_TABLE.some((row) => row.key === start.key && row.step === start.step)) {
-      throw new WalkRefusedError("notWaitingStep", [start.step, start.key]);
+      throw new WalkRefusedError("eventKeyAtWalk", [start.step, start.key]);
     }
     const waiting = held(start.step);
     enter(waiting.id);

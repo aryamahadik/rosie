@@ -33,15 +33,16 @@ import { NotBuiltError } from "../../tool-api/errors";
  *   - settledNotRows: a plain step's bound buttons settler answered neither "ask" nor rows in a step writer's shape
  *     (K-09 README default 199; T-1491), so the walk can neither ask the step nor write it as walked; or a reach settler
  *     answered no text at all (default 227);
- *   - notWaitingStep: an event or resume start (K-09 v1.14 defaults 226 and 235; T-1562) names a step and a key that are
- *     not a pair of the event table (walk.ts EVENT_TABLE), naming the step and the key alone;
  *   - rowNotStep: a step's writer (or its buttons settler) gave an outbox row that names another step than its own
  *     (K-05 v1.22 item 82: a writer's rows carry the writer's own step; T-1479), so the row would carry another step's
  *     line to its reader;
  *   - eventKeyAtWalk: a step's writer (or its buttons settler) gave a key a turn never gives (walk.ts EVENT_ONLY_KEYS:
  *     id_checked, given only by the ID upload on the secure page; K-09 README default 209; T-1532; and control_proven,
  *     given only by the team's decision proving control: K-09 v1.14 default 223, T-1562), naming the step and the key
- *     alone.
+ *     alone; or an event or resume start (K-09 v1.14 defaults 226 and 235; T-1562) names a step and a key that are no pair
+ *     of the event table (walk.ts EVENT_TABLE), so the walk would start past a step that does not wait on that key, naming
+ *     the step and the key alone. (The fault list is K-09 v1.13 default 217's, classed in tool-api/refusal.ts, so the
+ *     start's refusal takes this final fault of the event table rather than a new one.)
  */
 export type WalkFault =
   | "flowNotInBundle"
@@ -60,8 +61,7 @@ export type WalkFault =
   | "settledNotInBundle"
   | "settledNotRows"
   | "rowNotStep"
-  | "eventKeyAtWalk"
-  | "notWaitingStep";
+  | "eventKeyAtWalk";
 
 /** The walk refused the part: the whole turn is refused and nothing is written. */
 export class WalkRefusedError extends Error {

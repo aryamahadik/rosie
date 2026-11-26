@@ -326,7 +326,7 @@ describe("walk.ts: the waiting-step starts (WalkStart event and resume: defaults
     },
   );
 
-  it("a start whose step and key are no pair of the event table is refused notWaitingStep, naming them alone", () => {
+  it("a start whose step and key are no pair of the event table is refused eventKeyAtWalk, naming them alone", () => {
     for (const [step, key] of [
       ["S1-10", "control_proven"],
       ["S1-32", "id_checked"],
@@ -334,7 +334,7 @@ describe("walk.ts: the waiting-step starts (WalkStart event and resume: defaults
     ] as const) {
       expectRefused(
         thrownBySync(() => walkFrom(restGraph(), { kind: "resume", step, key })),
-        "notWaitingStep",
+        "eventKeyAtWalk",
         [step, key],
       );
     }

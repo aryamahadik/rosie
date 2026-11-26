@@ -1007,6 +1007,9 @@ export function waitWriters(): Record<string, StepWriter<WalkTestRepo>> {
 // ---------------------------------------------------------------------------------------------------------------
 // T-1562: the text path's test graph (ruling T-1543 card B6; K-01 v1.1's stop; K-09 v1.14 defaults 223, 226 to 229)
 
+/** S1-09's owner branch (MASTER-FLOW-A.md line 118), the first of S1_09_BRANCHES. */
+const S1_09_OWNER = "An owner; the listing matches";
+
 /** S1-75's branches (MASTER-FLOW-A lines 191 to 199; master-A.json S1-75). */
 export const S1_75_BRANCHES = ["Code to the listed phone or email", "Rosie's team checks"] as const;
 /** S1-71's branches (master-A.json S1-71). */
@@ -1212,7 +1215,7 @@ export function flowARest(): GraphValue {
  */
 export function flowARestPastTheWait(): GraphValue {
   const graph = flowARest();
-  branchIn(graph, "S1-09", S1_09_BRANCHES[0]).rejoinAt = "S1-75";
+  branchIn(graph, "S1-09", S1_09_OWNER).rejoinAt = "S1-75";
   return graph;
 }
 
@@ -1314,7 +1317,7 @@ export function turnAnswering(
   question: string,
   branch?: string,
 ): { part: PassedPart; context: CommitTurnContext<WalkTestRepo>; choice: Choice } {
-  const turn = turnS1_09OnV3(S1_09_BRANCHES[0]);
+  const turn = turnS1_09OnV3(S1_09_OWNER);
   const words = "the step's question, as asked";
   const choice: Choice =
     branch === undefined
