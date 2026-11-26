@@ -56,6 +56,17 @@
 // its version 2 to 3, with its status, options, read-back, clock line and clock row as they were; a replay writes
 // nothing. Compose input composes the row from S1-02's own line and finalize finalizes it, its plan written. A second
 // asked text then writes no row and leaves ask_count at 2: the turn commits its text's safety outcome alone.
+//
+// T-1559 (K-09 default 192 (a) widened by T-1557 item 3; DL-1214): a fourth world, built as the first. The same turn 1
+// opens S1-02's question, asked once; then both reads agree the owner's "A bit of everything" fits nothing (none_fits,
+// outcome go), which the gate answers noAction. The commit sends the question once more as for an asked text: one quick
+// reply, the raise 1 to 2, the part still noAction; a replay writes nothing, and a second none_fits text at ask_count 2
+// writes no row and no raise.
+//
+// T-1559 round 2 (DL-1227; K-09 default 222 as T-1557 round 2 words it): a fifth world, built as the first. The same
+// turn 1 opens S1-02's question; then both reads agree the text fits nothing, but decide ends the part in one question
+// (none_fits, outcome oneQuestion), which the gate answers asked. The commit sends the question once more just as in the
+// fourth world, the part still asked; a second such text at ask_count 2 writes no row and no raise.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -1245,6 +1256,369 @@ describe("an asked text sends S1-02's one open question again, once, its ask cou
         effects: 0,
       });
       const [raised] = await asked.cdb.db.sql<{ n: number }[]>`
+        select count(*)::int as n from event_log where kind = 'open_question.asked_again'
+      `;
+      expect(raised?.n).toBe(1);
+    },
+  );
+});
+
+// ---- T-1559: the fourth world, a text that fits nothing sends S1-02's question once more ---------------------------------
+
+/** The none_fits turns, each under its own id (K-09 v1.5 default 131). */
+const TURN_NONE_FITS = `${TURN_2}-none-fits`;
+const TURN_NONE_FITS_AGAIN = `${TURN_2}-none-fits-again`;
+/** The re-sent row: S1-02's step, the turn's own id as its key, n 1 (K-09 v1.12 default 192). */
+const ROW_NONE_FITS = `outbox-s1-02-${TURN_NONE_FITS}-1`;
+
+/**
+ * A none_fits turn: turn 2's request as this owner sends it under `turnId`, its text "A bit of everything", and decide's
+ * agreed part and both reads none_fits (K-02 v1: its quote and why alone), with outcome go, which the gate answers
+ * noAction, or with outcome oneQuestion (T-1559 round 2), which the gate answers asked.
+ */
+function noneFitsTurn(turnId: string, outcome: "go" | "oneQuestion" = "go"): GateAndCommitRequest {
+  const request = turnTwo(turnId, "c-01", ASKED_WORDS);
+  const part = {
+    verb: "none_fits",
+    quote: ASKED_WORDS,
+    why: "No offered choice is about this text.",
+  } as unknown as DecidePart;
+  const decided = decidedOf(request);
+  decided.decide.parts = [{ part: structuredClone(part), outcome }];
+  for (const read of decided.decide.reads) read.output.parts = [structuredClone(part)];
+  return request;
+}
+
+/** K-09's part result for the none_fits part: noAction, no limit run, no key (gate.ts default 2). */
+const NONE_FITS_PARTS: Json[] = [
+  {
+    part: 0,
+    choiceId: null,
+    result: "noAction",
+    limits: [1, 2, 3, 4, 5, 6].map((limit) => ({ limit, result: "notChecked", outcome: null })),
+    stoppedBy: null,
+    gives: [],
+    dependsOnPart: null,
+  },
+];
+
+describe("a text that fits nothing sends S1-02's one open question once more at ask count 1; a second sends nothing (T-1559; K-09 default 192 (a) widened)", () => {
+  const noneFitsSent = { app: [] as string[], job: [] as string[] };
+  let fits: World;
+  let before: { question: Json; clock: Json };
+
+  beforeAll(async () => {
+    fits = await openWorld({
+      schema: "turn_face_sign_up_none_fits",
+      name: "rosie-turn-face-sign-up-none-fits",
+      sent: noneFitsSent,
+      trades: tradesOverV2(),
+      settleSignUp: false,
+    });
+  }, 240_000);
+
+  afterAll(async () => {
+    await Promise.all([fits.app.end({ timeout: 5 }), fits.job.end({ timeout: 5 })]);
+    await fits.cdb.close();
+  });
+
+  it("turn 1 opens S1-02's question in this world as in the first, asked once", SLOW, async () => {
+    expect(await joinAndDeliver(fits)).toBe(2);
+    before = await questionState(fits.cdb);
+    expect(before.question).toMatchObject({
+      status: "open",
+      version: 2,
+      ask_count: 1,
+      options: [],
+      readback: null,
+    });
+  });
+
+  it(
+    "a none_fits text: the part noAction, one quick reply that sends S1-02's question again, named in written.outboxRows, and the raise: ask_count 1 to 2, version 2 to 3, its clock row untouched; a replay writes nothing",
+    SLOW,
+    async () => {
+      clock.now = NOW_2;
+      const request = noneFitsTurn(TURN_NONE_FITS);
+      const answer = await fits.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: TURN_NONE_FITS,
+        repeated: false,
+      });
+      expect(validator.check("gateAndCommit", "response", answer)).toEqual([]);
+      const committed = answer as unknown as {
+        parts: Json[];
+        written: { written: Json[]; outboxRows: Json[]; promoted: Json[] };
+        openQuestions: { opened: string[]; closed: string[] };
+        effects: Json[];
+      };
+      expect(committed.parts).toEqual(NONE_FITS_PARTS);
+      expect(committed.written.written).toEqual([{ table: "open_questions", rowId: QUESTION_1, version: 3 }]);
+      expect(committed.written.outboxRows.map((row) => row.id)).toEqual([ROW_NONE_FITS]);
+      expect(committed.openQuestions).toEqual({ opened: [], closed: [] });
+      expect(committed.effects).toEqual([]);
+
+      const after = await questionState(fits.cdb);
+      expect(after.question).toEqual({ ...before.question, version: 3, ask_count: 2 });
+      expect(after.clock).toEqual(before.clock);
+      const { sql } = fits.cdb.db;
+      const rows = await sql<Json[]>`
+        select id, state, channel, send_class, open_question_id, recipient_handle_id, recipient_person_id, business_id,
+               booking_id, copy_of_row_id, versions_read, plan
+        from outbox_rows where turn_id = ${TURN_NONE_FITS}
+      `;
+      expect(rows).toEqual([
+        {
+          id: ROW_NONE_FITS,
+          state: "planned",
+          channel: "imessage",
+          send_class: "quick_reply",
+          open_question_id: QUESTION_1,
+          recipient_handle_id: HANDLE,
+          recipient_person_id: PERSON,
+          business_id: BUSINESS,
+          booking_id: null,
+          copy_of_row_id: null,
+          versions_read: [],
+          plan: null,
+        },
+      ]);
+      const entries = await sql<Json[]>`
+        select kind, row_id, old_values, new_values, why from event_log
+        where turn_id = ${TURN_NONE_FITS} and table_name in ('open_questions', 'outbox_rows') order by id collate "C"
+      `;
+      expect(entries).toEqual([
+        {
+          kind: "open_question.asked_again",
+          row_id: QUESTION_1,
+          old_values: { ask_count: 1 },
+          new_values: { ask_count: 2 },
+          why: { step: "S1-02" },
+        },
+        {
+          kind: "outbox_row.created",
+          row_id: ROW_NONE_FITS,
+          old_values: null,
+          new_values: { state: "planned", channel: "imessage", send_class: "quick_reply" },
+          why: { step: "S1-02" },
+        },
+      ]);
+      expect(await footprint(fits.cdb, TURN_NONE_FITS)).toMatchObject({
+        turns: 1,
+        outbox: 1,
+        questions: 0,
+        clocks: 0,
+        effects: 0,
+      });
+
+      // A replay answers the first commit and writes nothing.
+      const written = await snapshot(fits.cdb);
+      const again = await fits.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(again).toMatchObject({ result: "committed", turnId: TURN_NONE_FITS, repeated: true });
+      expect((again as unknown as typeof committed).written).toEqual({
+        written: [],
+        outboxRows: committed.written.outboxRows,
+        promoted: [],
+      });
+      expect(await snapshot(fits.cdb)).toEqual(written);
+    },
+  );
+
+  it(
+    "a second none_fits text on the same question (ask_count 2) writes no row and no raise; the turn commits its text's safety outcome alone",
+    SLOW,
+    async () => {
+      clock.now = NOW_3;
+      const questionBefore = await questionState(fits.cdb);
+      expect(questionBefore.question).toMatchObject({ status: "open", version: 3, ask_count: 2 });
+      const request = noneFitsTurn(TURN_NONE_FITS_AGAIN);
+      const answer = await fits.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: TURN_NONE_FITS_AGAIN,
+        repeated: false,
+        written: { written: [], outboxRows: [], promoted: [] },
+        openQuestions: { opened: [], closed: [] },
+      });
+      expect((answer as unknown as { parts: Json[] }).parts).toEqual(NONE_FITS_PARTS);
+      expect(await questionState(fits.cdb)).toEqual(questionBefore);
+      expect(await footprint(fits.cdb, TURN_NONE_FITS_AGAIN)).toMatchObject({
+        turns: 1,
+        outbox: 0,
+        questions: 0,
+        clocks: 0,
+        effects: 0,
+      });
+      const [raised] = await fits.cdb.db.sql<{ n: number }[]>`
+        select count(*)::int as n from event_log where kind = 'open_question.asked_again'
+      `;
+      expect(raised?.n).toBe(1);
+    },
+  );
+});
+
+// ---- T-1559 round 2: the fifth world, a none_fits part ended in one question sends S1-02's question once more ---------
+
+/** The none_fits turns ended in one question, each under its own id (K-09 v1.5 default 131). */
+const TURN_NONE_FITS_ASKED = `${TURN_2}-none-fits-asked`;
+const TURN_NONE_FITS_ASKED_AGAIN = `${TURN_2}-none-fits-asked-again`;
+/** The re-sent row: S1-02's step, the turn's own id as its key, n 1 (K-09 v1.12 default 192). */
+const ROW_NONE_FITS_ASKED = `outbox-s1-02-${TURN_NONE_FITS_ASKED}-1`;
+
+/** K-09's part result for a none_fits part ended in one question: asked, no limit run, no key (gate.ts default 2). */
+const NONE_FITS_ASKED_PARTS: Json[] = NONE_FITS_PARTS.map((part) => ({ ...part, result: "asked" }));
+
+describe("a none_fits text ended in one question sends S1-02's one open question once more at ask count 1; a second sends nothing (T-1559 round 2; DL-1227)", () => {
+  const noneFitsAskedSent = { app: [] as string[], job: [] as string[] };
+  let fitsAsked: World;
+  let before: { question: Json; clock: Json };
+
+  beforeAll(async () => {
+    fitsAsked = await openWorld({
+      schema: "turn_face_sign_up_none_fits_asked",
+      name: "rosie-turn-face-sign-up-none-fits-asked",
+      sent: noneFitsAskedSent,
+      trades: tradesOverV2(),
+      settleSignUp: false,
+    });
+  }, 240_000);
+
+  afterAll(async () => {
+    await Promise.all([fitsAsked.app.end({ timeout: 5 }), fitsAsked.job.end({ timeout: 5 })]);
+    await fitsAsked.cdb.close();
+  });
+
+  it("turn 1 opens S1-02's question in this world as in the first, asked once", SLOW, async () => {
+    expect(await joinAndDeliver(fitsAsked)).toBe(2);
+    before = await questionState(fitsAsked.cdb);
+    expect(before.question).toMatchObject({
+      status: "open",
+      version: 2,
+      ask_count: 1,
+      options: [],
+      readback: null,
+    });
+  });
+
+  it(
+    "a none_fits text ended in one question: the part asked, one quick reply that sends S1-02's question again, named in written.outboxRows, and the raise: ask_count 1 to 2, version 2 to 3, its clock row untouched; a replay writes nothing",
+    SLOW,
+    async () => {
+      clock.now = NOW_2;
+      const request = noneFitsTurn(TURN_NONE_FITS_ASKED, "oneQuestion");
+      const answer = await fitsAsked.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: TURN_NONE_FITS_ASKED,
+        repeated: false,
+      });
+      expect(validator.check("gateAndCommit", "response", answer)).toEqual([]);
+      const committed = answer as unknown as {
+        parts: Json[];
+        written: { written: Json[]; outboxRows: Json[]; promoted: Json[] };
+        openQuestions: { opened: string[]; closed: string[] };
+        effects: Json[];
+      };
+      expect(committed.parts).toEqual(NONE_FITS_ASKED_PARTS);
+      expect(committed.written.written).toEqual([{ table: "open_questions", rowId: QUESTION_1, version: 3 }]);
+      expect(committed.written.outboxRows.map((row) => row.id)).toEqual([ROW_NONE_FITS_ASKED]);
+      expect(committed.openQuestions).toEqual({ opened: [], closed: [] });
+      expect(committed.effects).toEqual([]);
+
+      const after = await questionState(fitsAsked.cdb);
+      expect(after.question).toEqual({ ...before.question, version: 3, ask_count: 2 });
+      expect(after.clock).toEqual(before.clock);
+      const { sql } = fitsAsked.cdb.db;
+      const rows = await sql<Json[]>`
+        select id, state, channel, send_class, open_question_id, recipient_handle_id, recipient_person_id, business_id,
+               booking_id, copy_of_row_id, versions_read, plan
+        from outbox_rows where turn_id = ${TURN_NONE_FITS_ASKED}
+      `;
+      expect(rows).toEqual([
+        {
+          id: ROW_NONE_FITS_ASKED,
+          state: "planned",
+          channel: "imessage",
+          send_class: "quick_reply",
+          open_question_id: QUESTION_1,
+          recipient_handle_id: HANDLE,
+          recipient_person_id: PERSON,
+          business_id: BUSINESS,
+          booking_id: null,
+          copy_of_row_id: null,
+          versions_read: [],
+          plan: null,
+        },
+      ]);
+      const entries = await sql<Json[]>`
+        select kind, row_id, old_values, new_values, why from event_log
+        where turn_id = ${TURN_NONE_FITS_ASKED} and table_name in ('open_questions', 'outbox_rows')
+        order by id collate "C"
+      `;
+      expect(entries).toEqual([
+        {
+          kind: "open_question.asked_again",
+          row_id: QUESTION_1,
+          old_values: { ask_count: 1 },
+          new_values: { ask_count: 2 },
+          why: { step: "S1-02" },
+        },
+        {
+          kind: "outbox_row.created",
+          row_id: ROW_NONE_FITS_ASKED,
+          old_values: null,
+          new_values: { state: "planned", channel: "imessage", send_class: "quick_reply" },
+          why: { step: "S1-02" },
+        },
+      ]);
+      expect(await footprint(fitsAsked.cdb, TURN_NONE_FITS_ASKED)).toMatchObject({
+        turns: 1,
+        outbox: 1,
+        questions: 0,
+        clocks: 0,
+        effects: 0,
+      });
+
+      // A replay answers the first commit and writes nothing.
+      const written = await snapshot(fitsAsked.cdb);
+      const again = await fitsAsked.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(again).toMatchObject({ result: "committed", turnId: TURN_NONE_FITS_ASKED, repeated: true });
+      expect((again as unknown as typeof committed).written).toEqual({
+        written: [],
+        outboxRows: committed.written.outboxRows,
+        promoted: [],
+      });
+      expect(await snapshot(fitsAsked.cdb)).toEqual(written);
+    },
+  );
+
+  it(
+    "a second none_fits text ended in one question (ask_count 2) writes no row and no raise; the turn commits its text's safety outcome alone",
+    SLOW,
+    async () => {
+      clock.now = NOW_3;
+      const questionBefore = await questionState(fitsAsked.cdb);
+      expect(questionBefore.question).toMatchObject({ status: "open", version: 3, ask_count: 2 });
+      const request = noneFitsTurn(TURN_NONE_FITS_ASKED_AGAIN, "oneQuestion");
+      const answer = await fitsAsked.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: TURN_NONE_FITS_ASKED_AGAIN,
+        repeated: false,
+        written: { written: [], outboxRows: [], promoted: [] },
+        openQuestions: { opened: [], closed: [] },
+      });
+      expect((answer as unknown as { parts: Json[] }).parts).toEqual(NONE_FITS_ASKED_PARTS);
+      expect(await questionState(fitsAsked.cdb)).toEqual(questionBefore);
+      expect(await footprint(fitsAsked.cdb, TURN_NONE_FITS_ASKED_AGAIN)).toMatchObject({
+        turns: 1,
+        outbox: 0,
+        questions: 0,
+        clocks: 0,
+        effects: 0,
+      });
+      const [raised] = await fitsAsked.cdb.db.sql<{ n: number }[]>`
         select count(*)::int as n from event_log where kind = 'open_question.asked_again'
       `;
       expect(raised?.n).toBe(1);
