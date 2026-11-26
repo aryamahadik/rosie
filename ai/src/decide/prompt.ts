@@ -30,7 +30,7 @@
 // same on every call (T-364's cached prefix: the decide prompt, then the flow's 50 rules, then the turn's cards). It ships
 // in the bundle as K-01's manifest.prompts.decide, as DECIDE_PROMPT gives it; a read uses its own bundle's copy.
 //
-// Two versions live here, and which one a turn reads is its pinned bundle's choice, never this file's:
+// Three versions live here, and which one a turn reads is its pinned bundle's choice, never this file's:
 //   decide-1 (T-368)   DECIDE_PROMPT, with DECIDE_PROMPT_VERSION, DECIDE_PROMPT_TEXT, decidePromptText() and
 //                      DECIDE_EXAMPLES. Bundles v0 and v1 ship it (bundles/v1/build.mjs reads DECIDE_PROMPT), so its
 //                      bytes never change.
@@ -39,8 +39,12 @@
 //                      else changed but the examples' count word: the typed_answers section (typed words that give
 //                      what the one open question asked for are a choose; a list is one part; with options that list
 //                      the same fields and differ only by something code looks up, the lowest id), one line in
-//                      quotes_and_fields (a text field's value is the typed words exactly), and example 6. A later
-//                      bundle cut ships it (T-1501).
+//                      quotes_and_fields (a text field's value is the typed words exactly), and example 6. Bundles
+//                      v1.1, v2 and v3 ship it (their build.mjs reads DECIDE_2_PROMPT), so its bytes never change.
+//   decide-3 (T-1555)  DECIDE_3_PROMPT, with DECIDE_3_PROMPT_VERSION, DECIDE_3_PROMPT_TEXT, decide3PromptText() and
+//                      DECIDE_3_EXAMPLES. It is decide-2's text with rules b to d rewritten, two lines added and three
+//                      examples added, and nothing else changed but the examples' count word (DL-1214; T-1507's
+//                      Gives folded in): see its own block below. Bundle cut v3.1 ships it (T-1556).
 
 import { sha256Hex } from "../cache";
 import { dataElement, escapeAttribute, parentElement } from "../context/tags";
@@ -267,8 +271,11 @@ export const DECIDE_2_PROMPT_VERSION = "decide-2";
  * Rules a to c (T-1500's card): typed words that give what the one open question asked for are a choose; a list is one
  * part; and, only when every option of that question lists the same fields, the lowest id carries the words.
  */
+const RULE_A_LINE =
+  "- Typed words that give what the one open question asked for are an answer to it: choose, never ask. What a question asks for is in its step card and in the fields its options list. A bare reply or reaction that gives nothing the question asked for is still ask.";
+
 const TYPED_ANSWERS = section("typed_answers", [
-  "- Typed words that give what the one open question asked for are an answer to it: choose, never ask. What a question asks for is in its step card and in the fields its options list. A bare reply or reaction that gives nothing the question asked for is still ask.",
+  RULE_A_LINE,
   "- A list in one text that answers one question, such as kinds of work separated by commas, is one part, and the whole list is its quote: never one part per item.",
   "- You never see Rosie's lists or records. When every option of the one open question lists the same fields, and the options differ only by something Rosie's code looks up, such as whether a word is on one of Rosie's lists, a list you cannot see is no reason to ask: choose that question's option with the lowest id (c-01 before c-02), wherever it is listed, and put the typed words in its field. That is not a guess: code checks the answer and settles which option is true. This rule applies only when every option of that question lists the same fields: never pick by lowest id among options with different fields, or when more than one question is open.",
 ]);
@@ -345,6 +352,177 @@ export const DECIDE_2_PROMPT: Readonly<{ version: string; sha256: string; text: 
   version: DECIDE_2_PROMPT_VERSION,
   sha256: sha256Hex(DECIDE_2_PROMPT_TEXT),
   text: DECIDE_2_PROMPT_TEXT,
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// decide-3 (T-1555; DL-1214, which folds in T-1507's Gives from DL-1021 and DL-1023): decide-2's text with rules b to d
+// rewritten, two lines added and examples 7 to 9 added.
+//
+// Why: on the user's iPhone (DL-1213) S1-09's answer "Lee’s Barbershop in Springfield, I’m the owner" was asked again.
+// S1-09's field `business` is of type id, decide-2 says what a value is for text, integer, boolean, money and time but
+// not for an id (K-09 README open gap 180), and nothing pinned which words the field takes, so the agreed value was not a
+// run of its own words and limit 6's id re-parse (actions/src/values/reparse.ts lines 343 to 345) refused it. The
+// rulings, each one line or example here:
+//   rule b            a field that answers the one open question takes the part's whole quote, words before a list
+//                     included (K-02 README default 16's span; T-1507 Gives 2), except S1-09's details (the next line);
+//   the span line     at S1-09 the `business` field's words are the business's name and town as typed, never the claim's
+//                     words or a comment after them (K-09 README defaults 200 to 202; the diagnosis's corrected fix);
+//   rule c            the lowest id whatever the text says about the work, the condition read from the options alone
+//                     (K-02 README default 16 (c); T-1507 Gives 3);
+//   rule d            widened to id fields: a value is the typed words exactly, never a made-up id, a slug, a state, a
+//                     company suffix or a listing's words (K-09 README default 200: "never an id");
+//   the words line    how rule b and rule d fit together, so decide-2's example 1 ("beard trim" inside a longer quote)
+//                     stands as it is (T-1507 Gives 2);
+//   examples 7 to 9   words before a list (T-1507 Gives 4), a text that reads as goods (T-1507 Gives 4), S1-09's
+//                     runbook text answered c-01 with the name and town as value and words (T-1555 Gives 4).
+// decide-1's "text, the words as the person means them" stays: CQ-368 is unanswered (T-1507 Gives 5's default), and
+// rule d, the narrower line, wins for a text field. Code backs rule d for id fields (id-words.ts): an id field's value is
+// set to its own words before two reads are compared, so a prompt rule is not all that holds it.
+
+/** decide-3's own version (K-01 `prompt.version`). */
+export const DECIDE_3_PROMPT_VERSION = "decide-3";
+
+/** Rule b, rewritten (T-1507 Gives 2): the quote and the one field's words are the part's whole quote. */
+const RULE_B_3_LINE =
+  "- A text that answers the one open question is one part, and its quote is the text's words that answer it, exactly as typed: a list in it, such as kinds of work separated by commas, is never one part per item, and words before the list stay in the quote. When the chosen option lists one field, that field's words are the part's whole quote exactly as typed, words before a list included: never a list cut out of it. The business's details are the one exception, in the next line.";
+
+/** S1-09's span (T-1555 Gives 3): the business's name and town as typed, never the claim's words. */
+const BUSINESS_SPAN_LINE =
+  "- When the question asks for the business's details, as S1-09's does with its field business, the business field's words are the business's name and town exactly as typed, without the claim's words, such as \"I'm the owner\", or a comment after them. The part's quote is still the whole text that answers the question.";
+
+/** Rule c, with "whatever the text says" and the condition read from the options alone (T-1507 Gives 3). */
+const RULE_C_3_LINE =
+  "- You never see Rosie's lists or records. When every option of the one open question lists the same fields, and the options differ only by something Rosie's code looks up, such as whether a word is on one of Rosie's lists, a list you cannot see is no reason to ask: choose that question's option with the lowest id (c-01 before c-02), wherever it is listed and whatever the text says about the work, goods, a delivery or a rental included, and put the typed words in its field. That is not a guess: code checks the answer and settles which option is true. Whether the options differ only by what code looks up is read from the options alone, their labels, definitions and fields, never from the text. This rule applies only when every option of that question lists the same fields: never pick by lowest id among options with different fields, or when more than one question is open.";
+
+const TYPED_ANSWERS_3 = section("typed_answers", [
+  RULE_A_LINE,
+  RULE_B_3_LINE,
+  BUSINESS_SPAN_LINE,
+  RULE_C_3_LINE,
+]);
+
+/** Rule d, widened to id fields (T-1555 Gives 2; K-09 README default 200). */
+const TEXT_OR_ID_VALUE_LINE =
+  "- A text or id field's value is the person's typed words exactly as typed, the same characters in order, the same as its words: never reworded, corrected, sorted or shortened, and never a made-up id, a slug, a state, a company suffix or a listing's words. An id field's value is text, as a text field's is. Two reads then give the same value.";
+
+/** How rule b and rule d fit together (T-1507 Gives 2's one line), so example 1 stands as it is. */
+const WORDS_AND_VALUE_LINE =
+  "- So a field's words say which part of the text it takes, and its value repeats those words: the one field of an option that answers the one open question takes the part's whole quote, the business's details aside, and a part with several fields, as in example 1, gives each field only the words that give it.";
+
+const QUOTES_AND_FIELDS_3 = section("quotes_and_fields", [
+  ...QUOTE_AND_FIELD_LINES,
+  TEXT_OR_ID_VALUE_LINE,
+  WORDS_AND_VALUE_LINE,
+  LANGUAGE_LINE,
+]);
+
+/** Example 7's typed words, written for this prompt: words before a list of kinds of work. */
+const EXAMPLE_7_TEXT = "Mostly we do dog walking, pet sitting and nail trims";
+/** Example 8's typed words, written for this prompt: words that read as goods. */
+const EXAMPLE_8_TEXT = "we make and sell wooden toys";
+/** Example 9's text: the S1-09 runbook's words as an iPhone types them, curly apostrophes and all (DL-1213). */
+const EXAMPLE_9_TEXT = "Lee’s Barbershop in Springfield, I’m the owner";
+/** Example 9's details: the business's name and town as typed, without the claim. */
+const EXAMPLE_9_DETAILS = "Lee’s Barbershop in Springfield";
+
+/** Example 7 (T-1507 Gives 4): words before a typed list stay in the quote and in the one field. */
+export const DECIDE_EXAMPLE_7: DecideExample = {
+  title: "Words before a typed list stay in the quote",
+  turn: [
+    "Open question: oq-4 (step S1-02).",
+    "Choices: c-03 (option, question oq-4) Not a service we book, fields kinds:text; c-01 (option, question oq-4) All on the list, fields kinds:text; c-02 (option, question oq-4) One isn't on the list yet, fields kinds:text.",
+    `Text: ${EXAMPLE_7_TEXT}`,
+  ],
+  step1: { language: "en", parts: [{ quote: EXAMPLE_7_TEXT, verb: "choose" }] },
+  step2: [
+    {
+      part: 1,
+      answer: {
+        question: "oq-4",
+        choice: "c-01",
+        fields: [{ name: "kinds", value: EXAMPLE_7_TEXT, words: EXAMPLE_7_TEXT }],
+      },
+    },
+  ],
+  why: "One open question, and the text gives the kinds of work it asked for, with words before the list: one part, a choose, whose quote is the whole text. Its one field, kinds, takes the whole quote exactly as typed, words before the list included, never the list cut out of it. The options list the same field and differ only by Rosie's list, so the choice is the lowest id, c-01.",
+};
+
+/** Example 8 (T-1507 Gives 4): a text that reads as goods still takes the lowest id, since code settles the option. */
+export const DECIDE_EXAMPLE_8: DecideExample = {
+  title: "A text that reads as goods still takes the lowest id",
+  turn: [
+    "Open question: oq-5 (step S1-02).",
+    "Choices: c-02 (option, question oq-5) One isn't on the list yet, fields kinds:text; c-03 (option, question oq-5) Not a service we book, fields kinds:text; c-01 (option, question oq-5) All on the list, fields kinds:text.",
+    `Text: ${EXAMPLE_8_TEXT}`,
+  ],
+  step1: { language: "en", parts: [{ quote: EXAMPLE_8_TEXT, verb: "choose" }] },
+  step2: [
+    {
+      part: 1,
+      answer: {
+        question: "oq-5",
+        choice: "c-01",
+        fields: [{ name: "kinds", value: EXAMPLE_8_TEXT, words: EXAMPLE_8_TEXT }],
+      },
+    },
+  ],
+  why: "The words read as goods, and one option's label seems to fit them, but read from the options alone the three differ only by Rosie's list: the choice is the lowest id, c-01, whatever the text says about the work, with the whole quote in kinds. Code settles which option is true.",
+};
+
+/** Example 9 (T-1555 Gives 4): S1-09's three options and the runbook text, answered c-01 with the name and town. */
+export const DECIDE_EXAMPLE_9: DecideExample = {
+  title: "The business's details: the name and town as typed",
+  turn: [
+    "Open question: oq-9 (step S1-09).",
+    "Choices: c-02 (option, question oq-9) Helps run it; not an owner, fields business:id; c-03 (option, question oq-9) No match, or already listed, fields business:id; c-01 (option, question oq-9) An owner; the listing matches, fields business:id.",
+    `Text: ${EXAMPLE_9_TEXT}`,
+  ],
+  step1: { language: "en", parts: [{ quote: EXAMPLE_9_TEXT, verb: "choose" }] },
+  step2: [
+    {
+      part: 1,
+      answer: {
+        question: "oq-9",
+        choice: "c-01",
+        fields: [{ name: "business", value: EXAMPLE_9_DETAILS, words: EXAMPLE_9_DETAILS }],
+      },
+    },
+  ],
+  why: "One open question, and the text gives the business's details and says they own it: one part, a choose, whose quote is the whole text. The listing is code's to check, which you never see, so an owner's claim takes the owner's option, c-01, and code settles whether the listing matches. The business field is an id field: its words are the name and town exactly as typed, the curly apostrophe kept, without the claim's words, and its value is the same characters, never a slug, a state, a company suffix or the listing's name.",
+};
+
+/** decide-3's worked examples: decide-2's six, then examples 7 to 9. */
+export const DECIDE_3_EXAMPLES: readonly DecideExample[] = [
+  ...DECIDE_2_EXAMPLES,
+  DECIDE_EXAMPLE_7,
+  DECIDE_EXAMPLE_8,
+  DECIDE_EXAMPLE_9,
+];
+
+/** decide-3's system prompt, built from the constants above alone: the same text every time it is built. */
+export function decide3PromptText(): string {
+  return [
+    ROLE_SENTENCE,
+    YOUR_JOB,
+    INPUT,
+    STEPS,
+    VERB_LINES,
+    BARE_REPLIES,
+    TYPED_ANSWERS_3,
+    QUOTES_AND_FIELDS_3,
+    examplesSection("Nine", DECIDE_3_EXAMPLES),
+    CLOSING,
+  ].join("\n\n");
+}
+
+/** decide-3's text, built once. */
+export const DECIDE_3_PROMPT_TEXT = decide3PromptText();
+
+/** decide-3 as a bundle ships it (K-01 `prompt`): its version, the sha256 of its UTF-8 bytes, and its text. */
+export const DECIDE_3_PROMPT: Readonly<{ version: string; sha256: string; text: string }> = Object.freeze({
+  version: DECIDE_3_PROMPT_VERSION,
+  sha256: sha256Hex(DECIDE_3_PROMPT_TEXT),
+  text: DECIDE_3_PROMPT_TEXT,
 });
 
 /** Step 1's tail of the per-turn part: the step tag alone (it holds no words, so it is no instruction inside data). */

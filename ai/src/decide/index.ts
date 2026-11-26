@@ -5,26 +5,37 @@
 // side and hands on K-02's `decideResult`; agree.ts compares them part by part. The one Sonnet re-read (T-370, C-116):
 // reread.ts runs it once per turn when asked; result.ts builds K-02's result before and after it.
 //
-// prompt.ts holds two versions of the system prompt: decide-1 (DECIDE_PROMPT), which bundles v0 and v1 ship, and
-// decide-2 (DECIDE_2_PROMPT, T-1500), which a later bundle cut ships. A turn reads its pinned bundle's copy.
+// prompt.ts holds three versions of the system prompt: decide-1 (DECIDE_PROMPT), which bundles v0 and v1 ship,
+// decide-2 (DECIDE_2_PROMPT, T-1500), which bundles v1.1, v2 and v3 ship, and decide-3 (DECIDE_3_PROMPT, T-1555), which
+// bundle cut v3.1 ships (T-1556). A turn reads its pinned bundle's copy. id-words.ts sets each id-typed field's value to
+// its own words before a read leaves the AI layer (T-1555's backstop).
 
 export { DECIDE_EFFORT, createDecideReader } from "./read";
 export { createDecider } from "./two-reads";
 export { agreeReads, partDifferences } from "./agree";
 export { rereadResult, twoReadResult, type ResultRoute } from "./result";
 export { REREAD_MEMORY, createRereadLedger, rereadTurn, type RereadLedger, type RereadStage } from "./reread";
+export { ID_TYPE, choicesById, idValuesAsWords, idValuesAsWordsInPart } from "./id-words";
 export {
   DECIDE_2_EXAMPLES,
   DECIDE_2_PROMPT,
   DECIDE_2_PROMPT_TEXT,
   DECIDE_2_PROMPT_VERSION,
+  DECIDE_3_EXAMPLES,
+  DECIDE_3_PROMPT,
+  DECIDE_3_PROMPT_TEXT,
+  DECIDE_3_PROMPT_VERSION,
   DECIDE_EXAMPLE_6,
+  DECIDE_EXAMPLE_7,
+  DECIDE_EXAMPLE_8,
+  DECIDE_EXAMPLE_9,
   DECIDE_EXAMPLES,
   DECIDE_PROMPT,
   DECIDE_PROMPT_TEXT,
   DECIDE_PROMPT_VERSION,
   ROLE_SENTENCE,
   decide2PromptText,
+  decide3PromptText,
   decidePromptText,
   exampleText,
   stageOneTail,

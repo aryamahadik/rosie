@@ -7,10 +7,16 @@
 // bundles v0 and v1 ship), and decide-2 is held to be decide-1's text with rules a to d and example 6 added and nothing
 // else changed. The added words are written out here, so a change to any of them is a change to this file too. No test
 // here calls a model: decide-2's live proof is a real text on staging once a bundle ships it (T-1501).
+//
+// decide-3 (T-1555; DL-1214, T-1507's Gives folded in) lives beside both, whose bytes stay pinned: it is held to be
+// decide-2's text with rules b to d rewritten, the S1-09 span line and the words line added, and examples 7 to 9 added,
+// and nothing else changed. Example 9 is held to bundle v3's S1-09 (its three options and field) and its value to limit
+// 6's real id rule (actions/src/values/reparse.ts). Its live proof is the S1-09 eval slice (evals/src/slices/s1-09).
 
 import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
+import { reparse } from "../../../actions/src/values/reparse";
 import { createPromptCache, sha256Hex, systemText } from "../cache";
 import { PREAMBLE } from "../context";
 import {
@@ -18,7 +24,14 @@ import {
   DECIDE_2_PROMPT,
   DECIDE_2_PROMPT_TEXT,
   DECIDE_2_PROMPT_VERSION,
+  DECIDE_3_EXAMPLES,
+  DECIDE_3_PROMPT,
+  DECIDE_3_PROMPT_TEXT,
+  DECIDE_3_PROMPT_VERSION,
   DECIDE_EXAMPLE_6,
+  DECIDE_EXAMPLE_7,
+  DECIDE_EXAMPLE_8,
+  DECIDE_EXAMPLE_9,
   DECIDE_EXAMPLES,
   DECIDE_PROMPT,
   DECIDE_PROMPT_TEXT,
@@ -29,6 +42,7 @@ import {
   STAGE2_SCHEMAS,
   VERBS,
   decide2PromptText,
+  decide3PromptText,
   decidePromptText,
   decideReadProblems,
   exampleText,
@@ -46,6 +60,8 @@ const compile = (schema: unknown): ReturnType<Ajv2020["compile"]> =>
 const DECIDE_1_SHA256 = "510090eb3e38b8375f82e8d9bf26d7338e9db41093b86df688b09bd4bba7c6a1";
 /** The sha256 of decide-2's UTF-8 bytes: a change to its text is a new prompt version, or a change made on purpose. */
 const DECIDE_2_SHA256 = "4e29b79473787d5b0196e1b3e2059bebea3032e4889b6bdb5694aca08aa0a259";
+/** The sha256 of decide-3's UTF-8 bytes (T-1555): what bundle cut v3.1 ships (T-1556). */
+const DECIDE_3_SHA256 = "17728e880dc94681556a1de4f24ccdcf70c8e2598718247a0e8a93dc64070b09";
 
 /** How many times `piece` appears in `text`. */
 const timesIn = (text: string, piece: string): number => text.split(piece).length - 1;
@@ -458,6 +474,303 @@ describe("decide-2's worked examples", () => {
     const texts = fixtureTexts();
     expect(texts.length).toBeGreaterThan(0);
     for (const example of DECIDE_2_EXAMPLES)
+      for (const text of texts) expect(example.turn.join("\n")).not.toContain(text);
+  });
+});
+
+// ---- decide-3's changed and added words, written out (T-1555 Gives 1 to 4; T-1507 Gives 2 to 4) ------------------------
+
+const RULE_B_3 =
+  "- A text that answers the one open question is one part, and its quote is the text's words that answer it, exactly as typed: a list in it, such as kinds of work separated by commas, is never one part per item, and words before the list stay in the quote. When the chosen option lists one field, that field's words are the part's whole quote exactly as typed, words before a list included: never a list cut out of it. The business's details are the one exception, in the next line.";
+const SPAN_LINE =
+  "- When the question asks for the business's details, as S1-09's does with its field business, the business field's words are the business's name and town exactly as typed, without the claim's words, such as \"I'm the owner\", or a comment after them. The part's quote is still the whole text that answers the question.";
+const RULE_C_3 =
+  "- You never see Rosie's lists or records. When every option of the one open question lists the same fields, and the options differ only by something Rosie's code looks up, such as whether a word is on one of Rosie's lists, a list you cannot see is no reason to ask: choose that question's option with the lowest id (c-01 before c-02), wherever it is listed and whatever the text says about the work, goods, a delivery or a rental included, and put the typed words in its field. That is not a guess: code checks the answer and settles which option is true. Whether the options differ only by what code looks up is read from the options alone, their labels, definitions and fields, never from the text. This rule applies only when every option of that question lists the same fields: never pick by lowest id among options with different fields, or when more than one question is open.";
+const RULE_D_3 =
+  "- A text or id field's value is the person's typed words exactly as typed, the same characters in order, the same as its words: never reworded, corrected, sorted or shortened, and never a made-up id, a slug, a state, a company suffix or a listing's words. An id field's value is text, as a text field's is. Two reads then give the same value.";
+const WORDS_LINE =
+  "- So a field's words say which part of the text it takes, and its value repeats those words: the one field of an option that answers the one open question takes the part's whole quote, the business's details aside, and a part with several fields, as in example 1, gives each field only the words that give it.";
+/** decide-3's typed_answers: rule a as decide-2 has it, then rule b rewritten, the span line and rule c rewritten. */
+const TYPED_ANSWERS_3 = ["<typed_answers>", RULE_A, RULE_B_3, SPAN_LINE, RULE_C_3, "</typed_answers>"].join(
+  "\n",
+);
+
+/** The S1-09 runbook's text as an iPhone types it (DL-1213), and the business's name and town in it. */
+const RUNBOOK_CURLY = "Lee’s Barbershop in Springfield, I’m the owner";
+const DETAILS_CURLY = "Lee’s Barbershop in Springfield";
+
+const EXAMPLE_9 = [
+  `<example n="9" title="The business's details: the name and town as typed">`,
+  "Open question: oq-9 (step S1-09).",
+  "Choices: c-02 (option, question oq-9) Helps run it; not an owner, fields business:id; c-03 (option, question oq-9) No match, or already listed, fields business:id; c-01 (option, question oq-9) An owner; the listing matches, fields business:id.",
+  `Text: ${RUNBOOK_CURLY}`,
+  `Step 1: {"language":"en","parts":[{"quote":"${RUNBOOK_CURLY}","verb":"choose"}]}`,
+  `Step 2, part 1: {"question":"oq-9","choice":"c-01","fields":[{"name":"business","value":"${DETAILS_CURLY}","words":"${DETAILS_CURLY}"}]}`,
+  "Why: One open question, and the text gives the business's details and says they own it: one part, a choose, whose quote is the whole text. The listing is code's to check, which you never see, so an owner's claim takes the owner's option, c-01, and code settles whether the listing matches. The business field is an id field: its words are the name and town exactly as typed, the curly apostrophe kept, without the claim's words, and its value is the same characters, never a slug, a state, a company suffix or the listing's name.",
+  "</example>",
+].join("\n");
+
+/** The three examples decide-3 adds, as the prompt shows them, the last line of the examples section after them. */
+const ADDED_EXAMPLES = [
+  exampleText(DECIDE_EXAMPLE_7, 7),
+  exampleText(DECIDE_EXAMPLE_8, 8),
+  exampleText(DECIDE_EXAMPLE_9, 9),
+].join("\n");
+
+/** Every line decide-3 adds or rewrites: none is in decide-1 or decide-2. */
+const DECIDE_3_ADDED = [RULE_B_3, SPAN_LINE, RULE_C_3, RULE_D_3, WORDS_LINE, EXAMPLE_9] as const;
+
+/** S1-09 as bundle v3 compiles it: its branches' labels and answer fields, in the card's order. */
+function s1_09OfBundleV3(): { label: string; answerFields: { name: string; type: string }[] }[] {
+  const flow = readJson("bundles/v3/bundle/flow/A.json") as {
+    steps: Record<string, { branches: { label: string; answerFields: { name: string; type: string }[] }[] }>;
+  };
+  const step = flow.steps["S1-09"];
+  if (step === undefined) throw new Error("bundle v3's flow A holds S1-09");
+  return step.branches;
+}
+
+describe("decide-3 (T-1555): decide-2's text with rules b to d rewritten, the span and words lines and examples 7 to 9 added, beside decide-1 and decide-2", () => {
+  it("is a constant of its own: version decide-3, the same text every build, the sha256 of its UTF-8 bytes (pinned), and neither decide-1's nor decide-2's", () => {
+    expect(DECIDE_3_PROMPT_VERSION).toBe("decide-3");
+    expect(decide3PromptText()).toBe(DECIDE_3_PROMPT_TEXT);
+    expect(DECIDE_3_PROMPT).toEqual({
+      version: "decide-3",
+      sha256: sha256Hex(DECIDE_3_PROMPT_TEXT),
+      text: DECIDE_3_PROMPT_TEXT,
+    });
+    expect(DECIDE_3_PROMPT.sha256).toBe(DECIDE_3_SHA256);
+    expect(Object.isFrozen(DECIDE_3_PROMPT)).toBe(true);
+    expect(DECIDE_3_PROMPT_TEXT.startsWith(ROLE_SENTENCE)).toBe(true);
+    expect(DECIDE_3_PROMPT_TEXT).not.toMatch(/[0-9]{4}-[0-9]{2}-[0-9]{2}T|evt-|turn-/u);
+    for (const other of [DECIDE_PROMPT, DECIDE_2_PROMPT]) {
+      expect(DECIDE_3_PROMPT_TEXT).not.toBe(other.text);
+      expect(DECIDE_3_PROMPT.sha256).not.toBe(other.sha256);
+    }
+  });
+
+  it("leaves decide-1 and decide-2 byte for byte (their pinned sha256) and puts none of its own lines in them", () => {
+    expect(sha256Hex(DECIDE_PROMPT_TEXT)).toBe(DECIDE_1_SHA256);
+    expect(sha256Hex(DECIDE_2_PROMPT_TEXT)).toBe(DECIDE_2_SHA256);
+    for (const added of DECIDE_3_ADDED) {
+      expect(DECIDE_PROMPT_TEXT).not.toContain(added);
+      expect(DECIDE_2_PROMPT_TEXT).not.toContain(added);
+    }
+    expect(timesIn(DECIDE_2_PROMPT_TEXT, "<example n=")).toBe(6);
+  });
+
+  it("packed in a bundle in decide-2's place, T-364's layout takes it (its sha256 holds) and puts it first in the cached prefix, for the two reads and the re-read", () => {
+    const cache = createPromptCache(withDecidePrompt(MINI_A, DECIDE_3_PROMPT));
+    const prompt = cache.layout({ purpose: "decideFirst", flow: "A", cards: [], turn: "a turn" });
+    expect(systemText(prompt).startsWith(DECIDE_3_PROMPT_TEXT)).toBe(true);
+    for (const purpose of ["decideCheck", "reread"] as const)
+      expect(cache.layout({ purpose, flow: "A", cards: [], turn: "a turn" }).segments).toEqual(
+        prompt.segments,
+      );
+  });
+
+  it("rule b: a text that answers the one open question is one part whose one field takes the whole quote, words before a list included, never a list cut out of it; the business's details the one exception", () => {
+    expect(DECIDE_3_PROMPT_TEXT).toContain(RULE_B_3);
+    expect(RULE_B_3).toContain("words before the list stay in the quote");
+    expect(RULE_B_3).toContain(
+      "When the chosen option lists one field, that field's words are the part's whole quote exactly as typed, words before a list included: never a list cut out of it.",
+    );
+    expect(RULE_B_3).toContain("The business's details are the one exception, in the next line.");
+    // decide-2's rule b, which could be read as the list alone, is gone from decide-3.
+    expect(DECIDE_3_PROMPT_TEXT).not.toContain(RULE_B);
+  });
+
+  it("the span line: at a question that asks for the business's details (S1-09's), the business field's words are the name and town exactly as typed, without the claim's words or a comment after them", () => {
+    expect(DECIDE_3_PROMPT_TEXT).toContain(SPAN_LINE);
+    expect(SPAN_LINE).toContain("as S1-09's does with its field business");
+    expect(SPAN_LINE).toContain(
+      "the business field's words are the business's name and town exactly as typed, without the claim's words",
+    );
+    expect(SPAN_LINE).toContain("or a comment after them");
+    // It follows rule b, which names it as its one exception.
+    expect(DECIDE_3_PROMPT_TEXT).toContain(`${RULE_B_3}\n${SPAN_LINE}\n${RULE_C_3}`);
+  });
+
+  it("rule c: the lowest id whatever the text says about the work, the condition read from the options alone, and still only when every option lists the same fields and one question is open", () => {
+    expect(DECIDE_3_PROMPT_TEXT).toContain(RULE_C_3);
+    expect(RULE_C_3).toContain(
+      "whatever the text says about the work, goods, a delivery or a rental included",
+    );
+    expect(RULE_C_3).toContain(
+      "Whether the options differ only by what code looks up is read from the options alone, their labels, definitions and fields, never from the text.",
+    );
+    // decide-2's narrowing stands word for word (DL-1018).
+    expect(RULE_C_3).toContain(
+      "This rule applies only when every option of that question lists the same fields: never pick by lowest id among options with different fields, or when more than one question is open.",
+    );
+    expect(DECIDE_3_PROMPT_TEXT).not.toContain(RULE_C);
+  });
+
+  it("rule d, widened to id fields: a text or id field's value is the typed words exactly, never a made-up id, a slug, a state, a company suffix or a listing's words; then the words line, so example 1 stands", () => {
+    expect(RULE_D_3).toContain(
+      "A text or id field's value is the person's typed words exactly as typed, the same characters in order, the same as its words",
+    );
+    expect(RULE_D_3).toContain("never a made-up id, a slug, a state, a company suffix or a listing's words");
+    expect(RULE_D_3).toContain("Two reads then give the same value.");
+    expect(DECIDE_3_PROMPT_TEXT).not.toContain(RULE_D);
+    expect(DECIDE_3_PROMPT_TEXT).toContain(
+      `Code reads every value again from its words, so the words must hold it.\n${RULE_D_3}\n${WORDS_LINE}\n- language: `,
+    );
+    expect(WORDS_LINE).toContain("as in example 1, gives each field only the words that give it");
+    // Example 1 is decide-1's, unchanged: "beard trim" inside a longer quote.
+    expect(DECIDE_3_EXAMPLES[0]).toBe(DECIDE_EXAMPLES[0]);
+  });
+
+  it("rule a, the bare-reply rules and the rest of decide-2 stand; the typed_answers section sits where decide-2's does", () => {
+    expect(DECIDE_3_PROMPT_TEXT).toContain(RULE_A);
+    expect(DECIDE_3_PROMPT_TEXT).toContain(`</bare_replies>\n\n${TYPED_ANSWERS_3}\n\n<quotes_and_fields>`);
+  });
+
+  it("examples 7 to 9 follow decide-2's six, nine worked examples in all, example 9 written out as the prompt shows it", () => {
+    expect(exampleText(DECIDE_EXAMPLE_9, 9)).toBe(EXAMPLE_9);
+    expect(DECIDE_3_PROMPT_TEXT).toContain(`${EXAMPLE_6}\n${ADDED_EXAMPLES}\n</examples>`);
+    expect(DECIDE_3_PROMPT_TEXT).toContain(
+      "Nine worked examples, each shortened: what the turn holds, each step's answer, and why.",
+    );
+    expect(timesIn(DECIDE_3_PROMPT_TEXT, "<example n=")).toBe(9);
+    expect(DECIDE_3_EXAMPLES).toEqual([
+      ...DECIDE_2_EXAMPLES,
+      DECIDE_EXAMPLE_7,
+      DECIDE_EXAMPLE_8,
+      DECIDE_EXAMPLE_9,
+    ]);
+  });
+
+  it("changes nothing else: with its rules and lines put back to decide-2's, examples 7 to 9 taken out and the count word put back, it is decide-2 byte for byte", () => {
+    const changed = [
+      `${TYPED_ANSWERS_3}\n`,
+      `${RULE_D_3}\n${WORDS_LINE}\n`,
+      `${ADDED_EXAMPLES}\n`,
+      "Nine worked",
+    ];
+    for (const piece of changed) expect(timesIn(DECIDE_3_PROMPT_TEXT, piece), piece).toBe(1);
+    const back = DECIDE_3_PROMPT_TEXT.replace(`${TYPED_ANSWERS_3}\n`, `${TYPED_ANSWERS}\n`)
+      .replace(`${RULE_D_3}\n${WORDS_LINE}\n`, `${RULE_D}\n`)
+      .replace(`${ADDED_EXAMPLES}\n`, "")
+      .replace("Nine worked", "Six worked");
+    expect(back).toBe(DECIDE_2_PROMPT_TEXT);
+    expect(sha256Hex(back)).toBe(DECIDE_2_SHA256);
+  });
+
+  it("tells the model to guess nothing: decide-1's lines against guessing stand, and no added line asks it to assume or invent", () => {
+    expect(DECIDE_3_PROMPT_TEXT).toContain("when a part is unclear, ask; never guess.");
+    expect(DECIDE_3_PROMPT_TEXT).toContain("never take a value from a fact, a recent message or a guess.");
+    expect(RULE_C_3).toContain("That is not a guess: code checks the answer");
+    for (const added of DECIDE_3_ADDED)
+      expect(added).not.toMatch(/\b(?:assume|invent|make up|best guess|most likely|probably)\b/iu);
+    for (const example of [DECIDE_EXAMPLE_7, DECIDE_EXAMPLE_8])
+      expect(example.why).not.toMatch(/\b(?:assume|invent|make up|best guess|most likely|probably)\b/iu);
+  });
+});
+
+describe("decide-3's worked examples", () => {
+  it.each(DECIDE_3_EXAMPLES.map((example, k) => [k + 1, example] as const))(
+    "decide-3: example %i: each step's answer is one its schema accepts, and mapped they make a K-02 read whose quotes are in its text",
+    (_n, example) => {
+      checkedRead(DECIDE_3_PROMPT_TEXT, example);
+    },
+  );
+
+  it("decide-3: example 7 has words before its typed list, and its one field takes the whole quote, never the list, under the lowest id listed second", () => {
+    const typed = textOf(DECIDE_EXAMPLE_7);
+    expect(typed).toBe("Mostly we do dog walking, pet sitting and nail trims");
+    const list = typed.slice(typed.indexOf("dog walking"));
+    expect(list).not.toBe(typed);
+    expect(checkedRead(DECIDE_3_PROMPT_TEXT, DECIDE_EXAMPLE_7)).toEqual({
+      language: "en",
+      parts: [
+        {
+          verb: "choose",
+          quote: typed,
+          question: "oq-4",
+          choice: "c-01",
+          fields: [{ name: "kinds", value: typed, words: typed }],
+        },
+      ],
+    });
+    const choices = DECIDE_EXAMPLE_7.turn.find((line) => line.startsWith("Choices: ")) ?? "";
+    expect(choices.startsWith("Choices: c-03 ")).toBe(true);
+    expect(timesIn(choices, "fields kinds:text")).toBe(3);
+  });
+
+  it("decide-3: example 8's words read as goods and still take the lowest id with the whole quote", () => {
+    const typed = textOf(DECIDE_EXAMPLE_8);
+    expect(typed).toMatch(/\bsell\b/u);
+    expect(DECIDE_EXAMPLE_8.turn.join("\n")).toContain("Not a service we book");
+    expect(checkedRead(DECIDE_3_PROMPT_TEXT, DECIDE_EXAMPLE_8)).toEqual({
+      language: "en",
+      parts: [
+        {
+          verb: "choose",
+          quote: typed,
+          question: "oq-5",
+          choice: "c-01",
+          fields: [{ name: "kinds", value: typed, words: typed }],
+        },
+      ],
+    });
+    expect(DECIDE_EXAMPLE_8.why).toContain("whatever the text says about the work");
+  });
+
+  it("decide-3: example 9 is S1-09 as bundle v3 compiles it (its three options word for word, each listing business:id), the runbook text, answered c-01 with business words and value both the name and town as typed", () => {
+    const branches = s1_09OfBundleV3();
+    expect(branches.map((branch) => branch.label)).toEqual([
+      "An owner; the listing matches",
+      "Helps run it; not an owner",
+      "No match, or already listed",
+    ]);
+    const choices = DECIDE_EXAMPLE_9.turn.find((line) => line.startsWith("Choices: ")) ?? "";
+    branches.forEach((branch, k) => {
+      expect(branch.answerFields).toEqual([{ name: "business", type: "id" }]);
+      // The frontier numbers the options c-01 to c-03 in the card's order (assemble.ts); a read lists them shuffled.
+      expect(choices).toContain(
+        `c-0${String(k + 1)} (option, question oq-9) ${branch.label}, fields business:id`,
+      );
+    });
+    expect(choices.startsWith("Choices: c-01 ")).toBe(false);
+    expect(textOf(DECIDE_EXAMPLE_9)).toBe(RUNBOOK_CURLY);
+    expect(checkedRead(DECIDE_3_PROMPT_TEXT, DECIDE_EXAMPLE_9)).toEqual({
+      language: "en",
+      parts: [
+        {
+          verb: "choose",
+          quote: RUNBOOK_CURLY,
+          question: "oq-9",
+          choice: "c-01",
+          fields: [{ name: "business", value: DETAILS_CURLY, words: DETAILS_CURLY }],
+        },
+      ],
+    });
+    // The words are the name and town, without the claim's words, and in the text as typed (curly apostrophe kept).
+    expect(DETAILS_CURLY).not.toContain("owner");
+    expect(RUNBOOK_CURLY.startsWith(DETAILS_CURLY)).toBe(true);
+  });
+
+  it("decide-3: example 9's value passes limit 6's real id rule (reparse.ts lines 343 to 345), where a slug, a comma form, a state or the whole quote fails", () => {
+    const context = { sentAt: "2026-11-23T19:10:00Z", zones: ["America/New_York"] };
+    expect(reparse("id", DETAILS_CURLY, DETAILS_CURLY, context)).toEqual({ ok: true });
+    for (const wrong of [
+      "lees-barbershop-springfield",
+      "Lee's Barbershop, Springfield",
+      "Lee's Barbershop in Springfield, IL",
+      RUNBOOK_CURLY,
+    ])
+      expect(reparse("id", wrong, DETAILS_CURLY, context).ok, wrong).toBe(false);
+  });
+
+  it("decide-3: its nine examples cover what decide-2's six do, with no K-02 fixture's text", () => {
+    const verbs = DECIDE_3_EXAMPLES.flatMap((example) =>
+      (example.step1 as { parts: { verb: string }[] }).parts.map((part) => part.verb),
+    );
+    expect(new Set(verbs)).toEqual(new Set(["choose", "no_op", "ask", "hand_off"]));
+    const texts = fixtureTexts();
+    expect(texts.length).toBeGreaterThan(0);
+    for (const example of DECIDE_3_EXAMPLES)
       for (const text of texts) expect(example.turn.join("\n")).not.toContain(text);
   });
 });
