@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 922, [`b2169f75`](https://github.com/aryamahadik/rosie/commit/b2169f75), 2026-11-23 11:33:45 UTC.
+- **Through:** commit 924, [`4d384466`](https://github.com/aryamahadik/rosie/commit/4d384466), 2026-11-26 05:28:41 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 924. docs: COMMIT\_HISTORY.md through commit 922 (b2169f75, \#939) (\#941)
+
+- **Commit:** [`4d384466`](https://github.com/aryamahadik/rosie/commit/4d384466), by Arya Mahadik, 2026-11-26 05:28:41 UTC
+- **Pull request:** [#941](https://github.com/aryamahadik/rosie/pull/941) from `task/commit-history-243`, merged 2026-11-26 05:28:41 UTC. It squashed 1 branch commit:
+  - `5f75912` docs: COMMIT\_HISTORY.md through commit 922 (b2169f75, \#939)
+- **Files changed:** 1 (+36 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +36 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 923. T-1560: the local test database runs natively on the Apple-silicon Mac: imresamu/postgis:17-3.5-bookworm with no platform line, max\_locks\_per\_transaction=512 as its command (DL-358), a new volume rosie-pg-data-arm64 (the emulated one kept as a fallback); FINDINGS.md's addendum (DL-1220); CI keeps postgis/postgis:17-3.5 (\#940)
+
+- **Commit:** [`e78d358a`](https://github.com/aryamahadik/rosie/commit/e78d358a), by Arya Mahadik, 2026-11-26 05:28:36 UTC
+- **Pull request:** [#940](https://github.com/aryamahadik/rosie/pull/940) from `task/T-1560`, merged 2026-11-26 05:28:37 UTC. It squashed 1 branch commit:
+  - `2c2d3ed` T-1560: the local test database runs natively on the Apple-silicon Ma…
+- **Files changed:** 2 (+18 −5), by folder:
+  - `infra/` docker-compose.yml +12 −5
+  - `infra/spikes/postgis-emulation/` FINDINGS.md +6 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 922. docs: COMMIT\_HISTORY.md through commit 920 (d4fabf68, \#937) (\#939)
 
