@@ -20,6 +20,12 @@
 //
 // Rule 9: requests come from K-09 v1's fixtures and the master's sample cast (the 555-01xx range); the probe's user,
 // password and database are made up here. A check names what leaked, never its value, so a failing run prints no secret.
+//
+// T-1551 (T-1529's ruling, its card 5; K-09 v1.13 README defaults 216 and 217): on local PostgreSQL, through
+// db/repo/scope.ts withBusiness, a gateAndCommit whose handler writes a row in the call's transaction and then meets a
+// final fault of the six fault lists answers turnRefused, labels only, and the row is not there afterwards: nothing of
+// the refused part is written. A transient fault is thrown as before and writes nothing either; the same handler
+// answering a committed turn keeps its row, so the probe table shows a write when there is one.
 
 import { once } from "node:events";
 import { type AddressInfo, createConnection, createServer, type Socket } from "node:net";
@@ -30,12 +36,23 @@ import { resolvePrimaryUrl } from "../../../db/repo/client";
 import { DataAccessDatabaseError } from "../../../db/repo/clocks";
 import { type Sql, type Tx, withBusiness } from "../../../db/repo/scope";
 import type { Span } from "../../../runtime/src/trace";
+import { CommitRefusedError } from "../commit/errors";
+import { WalkRefusedError } from "../commit/walk/errors";
 import { CALL_NAMES, type CallName } from "./calls";
 import { ToolApiContractError } from "./errors";
 import { J5_LANE } from "./j5";
+import { CompaniesRefusedError } from "./journey-1/companies/errors";
+import { KindsReadError } from "./journey-1/kinds/errors";
 import type { BusinessScope, ScopeCall } from "./scope";
-import { acceptedExchanges, callerOf, contractFile, fixture, traceFor } from "./test-support";
-import { createToolApi, LaneContractError, type CallAnswer, type Handlers, type Lane } from "./tool-api";
+import { acceptedExchanges, callerOf, contractFile, fixture, traceFor, type Exchange } from "./test-support";
+import {
+  createToolApi,
+  LaneContractError,
+  type CallAnswer,
+  type CallContext,
+  type Handlers,
+  type Lane,
+} from "./tool-api";
 import { createToolApiValidator, type ToolApiValidator } from "./validator";
 
 type Json = Record<string, unknown>;
@@ -590,5 +607,117 @@ describe("the base names its K-09 call to the scope and answers K-09's transient
     const thrown = (outcome.settled as { thrown: unknown }).thrown;
     expect(thrown instanceof ToolApiContractError || thrown instanceof LaneContractError).toBe(true);
     expectFailedSpan(outcome.spans, "invalidResponse", request, call);
+  });
+});
+
+// ---- T-1551: nothing of a refused part is written ----------------------------------------------------------------------
+
+describe("a final fault answers turnRefused and nothing of the refused part is written, on local PostgreSQL (T-1551)", () => {
+  /** A person's row id made up here, which a read's K-05 answer carries: no answer, span or row may hold it. */
+  const MADE_UP_ROW = "person-t1551-made-up-int-5e0a";
+  const ROW_ID = "row-t1551-refused-part-1";
+
+  /**
+   * Handlers for every call that must not run, but gateAndCommit's: it writes one row of the probe table (a temporary
+   * table on the call's own connection) in the call's transaction, then ends as `end` says.
+   */
+  function writingHandlers(end: () => unknown, ran: string[]): Handlers<Tx> {
+    const handlers: Record<string, unknown> = { ...watchedHandlers(ran) };
+    handlers.gateAndCommit = async (_request: unknown, context: CallContext<Tx>): Promise<unknown> => {
+      ran.push("gateAndCommit");
+      await context.repo`insert into t1551_refused_part (id) values (${ROW_ID})`;
+      return end();
+    };
+    return handlers as Handlers<Tx>;
+  }
+
+  /** One gateAndCommit through the base on a one-connection client of the local server: what it settled and left. */
+  async function refusedOn(file: string, end: () => unknown) {
+    const { url } = localServer();
+    const sql = postgres(url, {
+      max: 1,
+      onnotice: () => undefined,
+      connection: { application_name: "rosie-t1551-tool-api" },
+    });
+    try {
+      await sql`create temporary table t1551_refused_part (id text primary key)`;
+      const { request } = fixture(file) as Exchange;
+      const ran: string[] = [];
+      const api = createToolApi({
+        validator,
+        scope: withBusinessScope(sql),
+        handlers: writingHandlers(end, ran),
+      });
+      const { trace, spans } = traceFor(request);
+      const settled = await api.call("gateAndCommit", structuredClone(request), trace).then(
+        (answer) => ({ answer }),
+        (thrown: unknown) => ({ thrown }),
+      );
+      const rows = await sql<{ id: string }[]>`select id from t1551_refused_part`;
+      return { settled, spans, ran, kept: rows.map((row) => row.id) };
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+  }
+
+  const finals: { what: string; file: string; thrown: () => Error; answer: CallAnswer }[] = [
+    {
+      what: "a second company with the party flag off (companies' secondCompany, naming S1-04)",
+      file: "commit-s1-04-refused-second-company.json",
+      thrown: () => new CompaniesRefusedError("secondCompany", ["S1-04"]),
+      answer: (fixture("commit-s1-04-refused-second-company.json") as Exchange).outcome as CallAnswer,
+    },
+    {
+      what: "a step the pinned bundle does not hold (the walk's stepNotInBundle, naming S1-04)",
+      file: "commit-s1-02-refused-step-not-in-bundle.json",
+      thrown: () => new WalkRefusedError("stepNotInBundle", ["S1-04"]),
+      answer: (fixture("commit-s1-02-refused-step-not-in-bundle.json") as Exchange).outcome as CallAnswer,
+    },
+    {
+      what: "a read that found no row (kindsRead's notFound), its K-05 answer holding the row id",
+      file: "commit-s1-04-refused-second-company.json",
+      thrown: () =>
+        new KindsReadError("readPickedKinds", "notFound", {
+          error: "notFound",
+          table: "persons",
+          rowId: MADE_UP_ROW,
+        }),
+      answer: { error: "turnRefused", from: "kindsRead", fault: "notFound", ids: ["readPickedKinds"] },
+    },
+  ];
+
+  for (const { what, file, thrown, answer } of finals) {
+    it(`${what}: answered turnRefused, labels only; the row the handler wrote is rolled back`, async () => {
+      const outcome = await refusedOn(file, () => {
+        throw thrown();
+      });
+      expect(outcome.ran).toEqual(["gateAndCommit"]);
+      expect(outcome.settled).toEqual({ answer });
+      expect(outcome.kept).toEqual([]);
+      expect(outcome.spans).toHaveLength(1);
+      expect(outcome.spans[0]).toMatchObject({ hop: "gate", outcome: "refused", error_code: "turnRefused" });
+      expect(validator.checkSpan(outcome.spans[0])).toEqual([]);
+      for (const seen of [outcome.settled, outcome.spans]) {
+        expect(JSON.stringify(seen)).not.toContain(MADE_UP_ROW);
+        expect(JSON.stringify(seen)).not.toContain(ROW_ID);
+      }
+    });
+  }
+
+  it("a transient fault (the commit's stillChanged) is thrown as before, and writes nothing either", async () => {
+    const stillChanged = new CommitRefusedError("stillChanged", ["oq-s1-04-sam-1"]);
+    const outcome = await refusedOn("commit-s1-04-refused-second-company.json", () => {
+      throw stillChanged;
+    });
+    expect(outcome.settled).toEqual({ thrown: stillChanged });
+    expect(outcome.kept).toEqual([]);
+    expect(outcome.spans[0]).toMatchObject({ outcome: "failed", error_code: "CommitRefusedError" });
+  });
+
+  it("the probe shows a write when there is one: the same handler answering a committed turn keeps its row", async () => {
+    const committed = fixture("commit-s1-02.json") as Exchange;
+    const outcome = await refusedOn("commit-s1-04-refused-second-company.json", () => committed.outcome);
+    expect(outcome.settled).toEqual({ answer: committed.outcome });
+    expect(outcome.kept).toEqual([ROW_ID]);
   });
 });

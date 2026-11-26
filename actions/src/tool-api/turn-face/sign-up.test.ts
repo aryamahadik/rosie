@@ -55,6 +55,7 @@ import {
 } from "../journey-1/kinds/test-support";
 import { PF_TEXT_KEYS, PlugInRefusedError, createPlugInWriters } from "../journey-1/plug-ins";
 import { overlayV1, tradesOverV1 } from "../journey-1/plug-ins/test-support";
+import type { TurnRefusal } from "../errors";
 import { traceFor } from "../test-support";
 import { createToolApi, type SpanRefusedReport } from "../tool-api";
 import { createToolApiValidator } from "../validator";
@@ -452,7 +453,10 @@ const MADE_UP_ROW = "person-t1468-made-up-7c1e";
 /** A SQLSTATE no id, time or hash of the turn holds. */
 const SQLSTATE = "40P01";
 
-/** Turn 2 through the Tool API base as any caller calls it, which records the base's own gate span. */
+/**
+ * Turn 2 through the Tool API base as any caller calls it, which records the base's own gate span: its answer (undefined
+ * when it threw) and what it threw.
+ */
 async function throughBase(made: Doubles, request: GateAndCommitRequest) {
   const reports: SpanRefusedReport[] = [];
   const base = createToolApi<unknown>({
@@ -464,11 +468,13 @@ async function throughBase(made: Doubles, request: GateAndCommitRequest) {
     },
   });
   const { trace, spans } = traceFor(request);
-  const thrown: unknown = await base.call("gateAndCommit", structuredClone(request), trace).then(
-    () => undefined,
-    (error: unknown) => error,
-  );
-  return { thrown, spans, reports };
+  const ran: { answer: unknown; thrown: unknown } = await base
+    .call("gateAndCommit", structuredClone(request), trace)
+    .then(
+      (answer: unknown) => ({ answer, thrown: undefined }),
+      (error: unknown) => ({ answer: undefined, thrown: error }),
+    );
+  return { ...ran, spans, reports };
 }
 
 /** Every text an error holds but its `answer`: its name, message and stack. */
@@ -484,6 +490,11 @@ describe("a failed item 78 or item 79 read rejects through the Tool API base wit
     read: string;
     fault: string;
     secret: string;
+    /**
+     * T-1551 (K-09 v1.13; T-1529's ruling 1): a final read fault's exact answer, turnRefused, labels only; null for a
+     * transient one, which is still thrown as before.
+     */
+    refused: TurnRefusal | null;
   }[] = [
     {
       name: "item 79 notFound with a made-up row id",
@@ -491,6 +502,7 @@ describe("a failed item 78 or item 79 read rejects through the Tool API base wit
       read: "readPickedKinds",
       fault: "notFound",
       secret: MADE_UP_ROW,
+      refused: { error: "turnRefused", from: "kindsRead", fault: "notFound", ids: ["readPickedKinds"] },
     },
     {
       name: "item 79 transient with a SQLSTATE",
@@ -498,6 +510,7 @@ describe("a failed item 78 or item 79 read rejects through the Tool API base wit
       read: "readPickedKinds",
       fault: "transient",
       secret: SQLSTATE,
+      refused: null,
     },
     {
       name: "item 78 transient with a SQLSTATE",
@@ -505,37 +518,55 @@ describe("a failed item 78 or item 79 read rejects through the Tool API base wit
       read: "readKindCatalog",
       fault: "transient",
       secret: SQLSTATE,
+      refused: null,
     },
   ];
 
   it.each(failures)(
     "$name: nothing is written, and no span or report holds the id or the SQLSTATE",
-    async ({ k05, read, fault, secret }) => {
+    async ({ k05, read, fault, secret, refused }) => {
       const made = doubles({ k05 });
-      const { thrown, spans, reports } = await throughBase(made, secondTurn());
-      expect(thrown).toBeInstanceOf(KindsReadError);
-      expect(thrown).toMatchObject({ name: "KindsReadError", read, fault });
+      const { answer, thrown, spans, reports } = await throughBase(made, secondTurn());
+      // A transient fault is thrown as before; a final one (T-1551) is answered turnRefused, exactly.
+      if (refused === null) {
+        expect(thrown).toBeInstanceOf(KindsReadError);
+        expect(thrown).toMatchObject({ name: "KindsReadError", read, fault });
+      } else {
+        expect(thrown).toBeUndefined();
+        expect(answer).toEqual(refused);
+      }
       // Nothing is written: no commit was sent, and no trade overlay was read after the failed read.
       expect(made.commit.requests).toEqual([]);
       expect(made.commit.commits).toEqual([]);
       expect(made.trades.reads).toEqual([]);
-      // The base's one gate span names the error by its name alone, and nothing was reported beside it.
+      // The base's one gate span names the error by its name alone (a refusal: turnRefused), and nothing was reported
+      // beside it.
       expect(spans).toHaveLength(1);
       expect(spans.map((span: Span) => span.hop)).toEqual(["gate"]);
       expect(validator.checkSpan(spans[0])).toEqual([]);
-      expect(JSON.stringify(spans)).toContain("KindsReadError");
+      expect(JSON.stringify(spans)).toContain(refused === null ? "KindsReadError" : "turnRefused");
       expect(JSON.stringify(spans)).not.toContain(secret);
       expect(reports).toEqual([]);
-      // Its name, message and stack hold neither; only `answer`, which nothing here reads, does.
-      expect(saidBy(thrown)).not.toContain(secret);
-      expect(JSON.stringify((thrown as KindsReadError).answer)).toContain(secret);
+      if (refused === null) {
+        // Its name, message and stack hold neither; only `answer`, which nothing here reads, does.
+        expect(saidBy(thrown)).not.toContain(secret);
+        expect(JSON.stringify((thrown as KindsReadError).answer)).toContain(secret);
+      } else {
+        // The refusal's answer holds labels alone: neither.
+        expect(JSON.stringify(answer)).not.toContain(secret);
+      }
 
-      // Through the turn face the same call rejects the same way, with nothing written.
+      // Through the turn face the same call rejects (a final fault: is answered) the same way, with nothing written.
       const again = doubles({ k05 });
       const faced = await through(again, secondTurn());
-      expect(faced.answer).toBeNull();
-      expect(faced.thrown).toBeInstanceOf(KindsReadError);
-      expect(faced.thrown).toMatchObject({ read, fault });
+      if (refused === null) {
+        expect(faced.answer).toBeNull();
+        expect(faced.thrown).toBeInstanceOf(KindsReadError);
+        expect(faced.thrown).toMatchObject({ read, fault });
+      } else {
+        expect(faced.thrown).toBeUndefined();
+        expect(faced.answer).toEqual(refused);
+      }
       expect(again.commit.requests).toEqual([]);
     },
   );
@@ -639,8 +670,13 @@ describe("signUpSteps on the turn face's binding: the words, not the option name
     // Without the settler the same answer is refused (branchNotWords), as before.
     const today = doubles();
     const before = await through(today, secondTurn("c-02"));
-    expect(before.answer).toBeNull();
-    expect(before.thrown).toMatchObject({ name: "KindsRefusedError", fault: "branchNotWords" });
+    expect(before.answer).toEqual({
+      error: "turnRefused",
+      from: "kinds",
+      fault: "branchNotWords",
+      ids: ["S1-02", "listed"],
+    });
+    expect(before.thrown).toBeUndefined();
     expect(today.commit.requests).toEqual([]);
   });
 
@@ -669,12 +705,13 @@ describe("signUpSteps on the turn face's binding: the words, not the option name
     for (const choiceId of ["c-01", "c-02", "c-03"]) {
       const made = doubles({ settled: true, stop: readsOn(seedWorld(), null) });
       const { answer, thrown } = await through(made, secondTurn(choiceId, `Barbershop, ${GIFT_CARDS}`));
-      expect(answer, choiceId).toBeNull();
-      expect(thrown, choiceId).toMatchObject({
-        name: "KindsRefusedError",
+      expect(answer, choiceId).toEqual({
+        error: "turnRefused",
+        from: "kinds",
         fault: "notBookedBesideKept",
         ids: ["S1-02"],
       });
+      expect(thrown, choiceId).toBeUndefined();
       expect(made.commit.requests, choiceId).toEqual([]);
       expect(made.questions.reads, choiceId).toEqual([]);
     }

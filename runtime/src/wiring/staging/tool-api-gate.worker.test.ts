@@ -87,8 +87,8 @@
 //     v2 through realGate, which asks S1-04 (three picks, none placed, barber's overlay read once); its S1-04 row's send
 //     is played on the runtime side (one delivered part, then K-05's armClock), so the question is open at version 2.
 //     Sam's own two-company answer ("Plumbing and electrical share Lee Home Services", commit-s1-04-some-share.json)
-//     then fails closed inside the Tool API base: realGate rejects with CompaniesRefusedError secondCompany, its message
-//     and fields labels alone, after one scope, its seal, item 79 and the kinds' names by id (item 26), with no item 72,
+//     then fails closed inside the Tool API base: realGate answers K-09 v1.13's turnRefused secondCompany (T-1551), its
+//     fields labels alone, after one scope, its seal, item 79 and the kinds' names by id (item 26), with no item 72,
 //     no S1-08 read, no commit sent and nothing written, the
 //     question still open, and no line holding the owner's words or number. "They all share one company"
 //     (commit-s1-04.json) then commits once: S1-04's question answered at its version, the three picks placed under the
@@ -114,10 +114,7 @@
 import { KEYED_SAFETY_IDS } from "@rosie/actions/src/domain/safety/ids";
 import { readStop, type StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
-import {
-  CompaniesReadError,
-  CompaniesRefusedError,
-} from "@rosie/actions/src/tool-api/journey-1/companies/errors";
+import { CompaniesReadError } from "@rosie/actions/src/tool-api/journey-1/companies/errors";
 import type { CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import { KindsReadError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { listingSummaryOf } from "@rosie/actions/src/tool-api/journey-1/listing/summary";
@@ -3386,7 +3383,7 @@ describe("an answer to an S1-04 that was asked, on staging's gate with S1-04's w
   );
 
   it(
-    "Sam's own two-company answer ('Plumbing and electrical share Lee Home Services') with the flag off fails closed inside the Tool API base: realGate rejects with CompaniesRefusedError secondCompany (labels only), never a K-09 answer, sent once and never retried by the gate; nothing written, the question still open at version 2, no line holding the owner's words or number",
+    "Sam's own two-company answer ('Plumbing and electrical share Lee Home Services') with the flag off fails closed inside the Tool API base: realGate answers turnRefused secondCompany (labels only; T-1551), sent once and never retried by the gate; nothing written, the question still open at version 2, no line holding the owner's words or number",
     { timeout: TEST_MS },
     async () => {
       const before = await rowCounts();
@@ -3397,36 +3394,35 @@ describe("an answer to an S1-04 that was asked, on staging's gate with S1-04's w
       const pinned = pinnedV2Kinds();
       const commits: unknown[] = [];
 
-      const thrown = await rejectionOf(
-        realGate({
-          reads,
-          commitTurn: (request) => {
-            commits.push(request);
-            return rooted.root.ports.turnRow.commitTurn(request);
-          },
-          bundles: () => rooted.root.ports.bundles,
-          pinnedOf: (trace) => (trace === call.trace ? pinned.bundle : null),
-        }).gateAndCommit(call.request as never, NOTHING_OPEN, call.trace),
-      );
+      const answered: unknown = await realGate({
+        reads,
+        commitTurn: (request) => {
+          commits.push(request);
+          return rooted.root.ports.turnRow.commitTurn(request);
+        },
+        bundles: () => rooted.root.ports.bundles,
+        pinnedOf: (trace) => (trace === call.trace ? pinned.bundle : null),
+      }).gateAndCommit(call.request as never, NOTHING_OPEN, call.trace);
 
-      // What the base hands back: the writer's refusal, thrown as it came (the base answers no K-09 error for it).
-      expect(thrown).toBeInstanceOf(CompaniesRefusedError);
-      expect(thrown).toMatchObject({ name: "CompaniesRefusedError", fault: "secondCompany", ids: ["S1-04"] });
-      expect((thrown as Error).message).toBe(new CompaniesRefusedError("secondCompany", ["S1-04"]).message);
-      expect(Object.keys(thrown as Error).sort()).toEqual(["fault", "ids", "name"]);
-      for (const text of textsOf(thrown)) {
-        for (const secret of [
-          TWO_COMPANIES_WORDS,
-          "Lee Home Services",
-          "Plumbing and electrical",
-          MULTI_KIND.number,
-          MULTI_KIND.number.slice(1),
-          MULTI_KIND.personId,
-          MULTI_KIND.handleId,
-          MULTI_KIND.chatId,
-        ]) {
-          expect(text, "the refusal holds the owner's words or an id").not.toContain(secret);
-        }
+      // What the base hands back for the writer's final refusal: K-09 v1.13's turnRefused, its labels alone (T-1551).
+      expect(answered).toEqual({
+        error: "turnRefused",
+        from: "companies",
+        fault: "secondCompany",
+        ids: ["S1-04"],
+      });
+      const text = JSON.stringify(answered);
+      for (const secret of [
+        TWO_COMPANIES_WORDS,
+        "Lee Home Services",
+        "Plumbing and electrical",
+        MULTI_KIND.number,
+        MULTI_KIND.number.slice(1),
+        MULTI_KIND.personId,
+        MULTI_KIND.handleId,
+        MULTI_KIND.chatId,
+      ]) {
+        expect(text, "the refusal holds the owner's words or an id").not.toContain(secret);
       }
       // Sent once, never again by the gate: one scope, its seal, S1-04's writer's item 79 and the kinds' names by id
       // (item 26, for "Some share one"'s words), refused once the groups are known: no item 72, no S1-08, no commit.
