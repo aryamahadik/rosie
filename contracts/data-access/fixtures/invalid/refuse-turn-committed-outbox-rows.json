@@ -1,0 +1,21 @@
+{
+  "call": "turnCommitted",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-first.json"],
+    "now": "2026-11-07T15:06:40Z",
+    "note": "turn-committed-alex answered with the first commit's outbox rows as well: the read says only whether the turn committed and when, and commitTurn answers the repeat in full (K-09 v1.14 default 222: 'the read need answer no more than that'). Refused for its one fault, outcome.outboxRows; put right, it is turn-committed-alex."
+  },
+  "request": {
+    "turnId": "turn-alex-book-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-book-1",
+    "committedAt": "2026-11-07T15:06:30Z",
+    "outboxRows": [
+      { "id": "out-alex-booked-riley", "commitSeq": 1 },
+      { "id": "out-sam-booked-riley", "commitSeq": 2 }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "call": "readBusinessStatus",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:20:00Z",
+    "note": "The demo owner's world after the control event's turn took S1-35's one-kind branch and made biz-demo-owner live (K-09 v1.14 commit-event-control-proven.json): its K-04 businesses row has status live, written by the test as noted. A second control event for it then finds the business live, so S1-32 is not waiting and the event is answered eventNotWaiting (K-09 v1.14 default 224 control_proven (3))."
+  },
+  "request": {
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "businessStatus",
+    "businessId": "biz-demo-owner",
+    "status": "live"
+  }
+}

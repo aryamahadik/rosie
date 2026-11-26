@@ -1,0 +1,21 @@
+{
+  "call": "readWaitingStep",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:14:00Z",
+    "note": "The demo owner's world after S1-29's 'Go live': the owner's walk reached S1-32, whose reach settler answered wait (K-09 v1.14 default 227), and that commit wrote the walk's record of the stop for person-demo-owner at biz-demo-owner, step S1-32, key control_proven (README open gap 109's record, written by the test once its home is ruled). Rosie's team then decided S1-75's control item done proving control at 15:12:00, which wrote biz-demo-owner's K-23 business_setup control_proven_at with control_proven_via team_check, so the key is on file. Read by the handle's next turn, whose resume asks S1-32's settler again (K-09 v1.14 default 235)."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "waiting",
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "step": "S1-32",
+    "key": "control_proven",
+    "keyOnFile": true
+  }
+}

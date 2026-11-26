@@ -1,0 +1,16 @@
+{
+  "call": "reviewItemById",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:12:03Z",
+    "note": "No K-37 review item has the id: none, and a control event naming it is answered eventNotWaiting with nothing written (K-09 v1.14 default 224)."
+  },
+  "request": {
+    "reviewItemId": "review-s1-75-demo-up-9"
+  },
+  "outcome": {
+    "result": "none",
+    "reviewItemId": "review-s1-75-demo-up-9"
+  }
+}

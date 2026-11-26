@@ -1,0 +1,17 @@
+{
+  "call": "readBusinessStatus",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:12:03Z",
+    "note": "The demo owner's world when Rosie's team decides S1-75's control item: biz-demo-owner's K-04 businesses row has status offline (its default; S1-35 has not made it live), written by the test as noted. The control event's gate reads it: the business is not live, so S1-32 may still wait (K-09 v1.14 default 224 control_proven (3))."
+  },
+  "request": {
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "businessStatus",
+    "businessId": "biz-demo-owner",
+    "status": "offline"
+  }
+}

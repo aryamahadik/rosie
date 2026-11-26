@@ -1,0 +1,26 @@
+{
+  "call": "liveStepLinkOf",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:31:05Z",
+    "note": "live-step-link-demo-owner-s1-10 whose link also carries its code's sha256: the link's secret stays with the page call that made it, and waiting needs only the link's id, purpose, step and lapse. Refused for its one fault, outcome.link.codeSha256; put right, it is live-step-link-demo-owner-s1-10."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "purpose": "setup_id_check",
+    "step": "S1-10",
+    "at": "2026-10-19T14:31:02Z"
+  },
+  "outcome": {
+    "result": "live",
+    "link": {
+      "id": "link-s1-10-demo-s109-1",
+      "purpose": "setup_id_check",
+      "step": "S1-10",
+      "expiresAt": "2026-10-19T15:00:00Z",
+      "codeSha256": "5f2b3c9d4e6a7b8c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "call": "readWaitingStep",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:31:40Z",
+    "note": "waiting-step-demo-owner-s1-10-held answered with S1-32's key at S1-10: each event step waits for its own key alone (K-09 v1.14 default 223's event table: id_checked at S1-10, control_proven at S1-32). Refused for its one fault, outcome.key; put right, it is waiting-step-demo-owner-s1-10-held."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "waiting",
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "step": "S1-10",
+    "key": "control_proven",
+    "keyOnFile": true
+  }
+}

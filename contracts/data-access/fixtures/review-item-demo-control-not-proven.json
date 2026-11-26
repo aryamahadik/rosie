@@ -1,0 +1,27 @@
+{
+  "call": "reviewItemById",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:12:03Z",
+    "note": "As review-item-demo-control-proven, but Rosie's team decided the control item done with controlProven false at 2026-10-20T15:12:00Z: K-09 decideReviewItem wrote the item's state done, decided_at, decided_by_person_id and outcome and wrote nothing back, so biz-demo-owner's K-23 business_setup row holds no control_proven_at (both columns null). The rows are written by the test as noted. The decision did not prove control, so a control event naming it is answered eventNotWaiting (K-09 v1.14 default 224)."
+  },
+  "request": {
+    "reviewItemId": "review-s1-75-demo-up-1"
+  },
+  "outcome": {
+    "result": "reviewItem",
+    "item": {
+      "id": "review-s1-75-demo-up-1",
+      "businessId": "biz-demo-owner",
+      "kind": "control",
+      "state": "done",
+      "raisedByPersonId": "person-demo-owner",
+      "decidedAt": "2026-10-20T15:12:00Z",
+      "decision": {
+        "outcome": "Control not proven: the ID does not match the listing.",
+        "controlProven": false
+      }
+    }
+  }
+}

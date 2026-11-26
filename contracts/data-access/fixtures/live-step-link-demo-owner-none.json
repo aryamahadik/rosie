@@ -1,0 +1,22 @@
+{
+  "call": "liveStepLinkOf",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T15:04:12Z",
+    "note": "As live-step-link-demo-owner-s1-10, but the upload finished at 15:04:10, after the link lapsed at 15:00:00 (page_links link-s1-10-demo-s109-1, issued 2026-10-12T15:00:00Z, expiring 2026-10-19T15:00:00Z, not ended; written by the test as noted). No link of the person at that business, purpose and step was live at that time, so the read answers none, the same answer as for a link never issued or one ended before it, and the event turn answers eventNotWaiting with nothing written (K-09 v1.14 default 224)."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "purpose": "setup_id_check",
+    "step": "S1-10",
+    "at": "2026-10-19T15:04:10Z"
+  },
+  "outcome": {
+    "result": "none",
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner",
+    "step": "S1-10"
+  }
+}

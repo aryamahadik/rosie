@@ -1,0 +1,17 @@
+{
+  "call": "readBusinessStatus",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:12:03Z",
+    "note": "business-status-demo-owner-offline answered with a status K-04 does not know: businesses_status_known admits offline, saved and live alone, and a pause is K-23's, never a status. Refused for its one fault, outcome.status; put right, it is business-status-demo-owner-offline."
+  },
+  "request": {
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "businessStatus",
+    "businessId": "biz-demo-owner",
+    "status": "paused"
+  }
+}
