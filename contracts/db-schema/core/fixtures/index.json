@@ -247,6 +247,38 @@
       "expect": "refuse",
       "shows": "The same turn's rows (S1-08's message row holding step S1-08 and line_no 0, and S1-09's open question), then S1-09's question row written with the step S1-9, which is no K-01 step id (two or three digits follow the dash), and line_no 0 is refused (CHECK outbox_rows_step_form, 23514, the form open_questions.step has); with step S1-09 the same insert passes",
       "source": "K-01 v1 stepId; K-04 v1 open_questions_step_form; K-05 README open gap 29 (outbox_rows.step: a K-01 stepId)"
+    },
+    {
+      "file": "seed-walk-wait-live.json",
+      "version": "v1.3",
+      "table": "walk_waits",
+      "expect": "accept",
+      "shows": "A live wait: Sam's walk at Lee's Barbershop stopped waitsOnEvent at S1-32 on control_proven by the commit of his turn turn-s1-32-sam (14:26:45Z), waiting since that commit, ended_at and ended_by_turn_id null; the one live row K-05's readWaitingStep (item 97) reads for Sam and the barbershop. Loaded after the ended wait, so the person, business and turns hold both",
+      "source": "DL-1244 (walk_waits; one live row per person, business and step); K-05 v1.25 item 97 and open gap 109; K-09 v1.14 defaults 223, 227 and 235 (S1-32 waits on control_proven)"
+    },
+    {
+      "file": "seed-walk-wait-ended.json",
+      "version": "v1.3",
+      "table": "walk_waits",
+      "expect": "accept",
+      "shows": "An ended wait: Sam's walk at Lee's Barbershop stopped waitsOnEvent at S1-10 on id_checked by the commit of turn-s1-10-sam (14:12:30Z), and ended by the commit of his ID upload's event turn, turn-id-checked-sam (14:20:11Z), which walked on from S1-10: ended_at that commit's time, ended_by_turn_id its turn. An ended row is outside walk_waits_one_live",
+      "source": "DL-1244 (ended_at and ended_by_turn_id; the commit ends the row in the resume or event commit); K-09 v1.14 defaults 209, 223 and 225 (S1-10 waits on id_checked; the event turn's resume)"
+    },
+    {
+      "file": "invalid/refuse-walk-wait-second-live.json",
+      "version": "v1.3",
+      "table": "walk_waits",
+      "expect": "refuse",
+      "shows": "With Sam's live wait at S1-32 at Lee's Barbershop loaded, the runtime side writing a second live row for the same person, business and step (wait-s1-32-sam-again, by a later turn of his, turn-s1-32-sam-again) is refused (the partial unique index walk_waits_one_live, 23505); the same row for the yoga studio, biz-yoga-studio, passes",
+      "source": "DL-1244 (one live row per person, business and step: a partial unique index where ended_at is null); K-09 v1.14 default 225 (wait again at S1-32: the step stays waiting and nothing else is written)"
+    },
+    {
+      "file": "invalid/refuse-walk-wait-ended-without-turn.json",
+      "version": "v1.3",
+      "table": "walk_waits",
+      "expect": "refuse",
+      "shows": "Sam's live wait at S1-32 updated by the runtime side to set ended_at (15:02:40Z, the commit time of his control_proven event turn, turn-control-proven-sam) with no ended_by_turn_id is refused (CHECK walk_waits_ended_by_turn, 23514); setting ended_by_turn_id turn-control-proven-sam with it, the same update passes",
+      "source": "T-1568's card (ended_by_turn_id set exactly when ended_at is); DL-1244 (the commit ends the row in the resume or event commit); K-09 v1.14 default 225"
     }
   ]
 }

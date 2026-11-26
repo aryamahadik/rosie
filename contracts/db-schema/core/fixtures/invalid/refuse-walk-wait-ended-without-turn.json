@@ -1,0 +1,38 @@
+{
+  "after": ["seed-walk-wait-live.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-control-proven-sam",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-control-proven-1"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-control-proven-1",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-19T15:02:40Z",
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "walk_waits",
+    "set": {
+      "ended_at": "2026-10-19T15:02:40Z"
+    },
+    "where": {
+      "id": "wait-s1-32-sam"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["walk_waits_ended_by_turn"]
+    }
+  }
+}

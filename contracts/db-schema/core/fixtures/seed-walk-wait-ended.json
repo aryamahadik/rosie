@@ -1,0 +1,53 @@
+{
+  "after": ["seed-person-roles.json", "seed-bundle-registry.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-s1-10-sam",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0003"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0003",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-19T14:12:30Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-id-checked-sam",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-id-upload-1"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-id-upload-1",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-19T14:20:11Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "walk_waits",
+      "values": {
+        "id": "wait-s1-10-sam",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-sam",
+        "step_id": "S1-10",
+        "key": "id_checked",
+        "waiting_since": "2026-10-19T14:12:30Z",
+        "turn_id": "turn-s1-10-sam",
+        "ended_at": "2026-10-19T14:20:11Z",
+        "ended_by_turn_id": "turn-id-checked-sam"
+      }
+    }
+  ]
+}

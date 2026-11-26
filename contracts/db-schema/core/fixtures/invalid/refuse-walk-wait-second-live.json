@@ -1,0 +1,43 @@
+{
+  "after": ["seed-walk-wait-live.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-s1-32-sam-again",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0005"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0005",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-19T14:31:02Z",
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "walk_waits",
+    "values": {
+      "id": "wait-s1-32-sam-again",
+      "business_id": "biz-lees-barbershop",
+      "person_id": "person-sam",
+      "step_id": "S1-32",
+      "key": "control_proven",
+      "waiting_since": "2026-10-19T14:31:02Z",
+      "turn_id": "turn-s1-32-sam-again",
+      "ended_at": null,
+      "ended_by_turn_id": null
+    },
+    "expect": {
+      "sqlstate": "23505",
+      "constraintOneOf": ["walk_waits_one_live"]
+    }
+  }
+}
