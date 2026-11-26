@@ -12,6 +12,7 @@
 // journey lanes.
 
 import type * as K21 from "../../../contracts/generated/page-api/page-api.v1";
+import type * as K21v14 from "../../../contracts/generated/page-api/page-api.v1.4";
 
 /** Every call K-21 v1 holds, in the order of `$defs/callName` (client.test.ts holds this list to the schema's). */
 export const PAGE_CALLS = [
@@ -62,6 +63,29 @@ export type ErrorOf<C extends PageCall> = Extract<OutcomeOf<C>, { error: string 
 
 /** K-21 v1 `$defs/<call>.response`: no response has an `error`. */
 export type ResponseOf<C extends PageCall> = Exclude<OutcomeOf<C>, { error: string }>;
+
+/**
+ * K-21 v1.4's two staging-only review calls (T-1548; ruling T-1543 card A8 (3); README defaults 79-82), in the order
+ * of v1.4's `$defs/callName` and `$defs/stagingOnlyCall` (client.test.ts holds them to the schema's). The web app knows
+ * them by name and type only (T-1565): no page makes them yet, so they are not a PageCall, and the client sends neither.
+ */
+export const REVIEW_TEST_CALLS = [
+  "testReviewItems",
+  "testDecideReviewItem",
+] as const satisfies readonly K21v14.PageApiV1Dot4["call"][];
+
+export type ReviewTestCall = (typeof REVIEW_TEST_CALLS)[number];
+
+/** A call the web app knows by name: one of K-21 v1's, or one of v1.4's two review calls. */
+export type KnownCall = PageCall | ReviewTestCall;
+
+/**
+ * What a known call answers: a K-21 v1 call's outcome as v1 types it (OutcomeOf), a v1.4 review call's as v1.4 types
+ * it (`$defs/<call>.exchange`'s outcome: its response, or one of its errors, stagingOnly among them).
+ */
+export type KnownOutcomeOf<C extends KnownCall> = C extends PageCall
+  ? OutcomeOf<C>
+  : Extract<K21v14.PageApiV1Dot4, { call: C }>["outcome"];
 
 // A set, so a name such as "constructor" is never taken for a call.
 const CALLS: ReadonlySet<string> = new Set(PAGE_CALLS);

@@ -1,0 +1,27 @@
+{
+  "call": "testDecideReviewItem",
+  "given": {
+    "now": "2026-10-20T14:30:00Z",
+    "environment": "production",
+    "after": [],
+    "note": "K-21 v1.4: the same request as test-decide-review-item.json reaches production. Deciding as the test console's member is staging's only (BP 9.4: 'Never in production'), so it decides nothing, writes nothing and answers stagingOnly; on production a review item is decided only by Rosie's team through teamDecideReviewItem (Q-18)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-staging-review-tester-0002",
+      "traceId": "trace-page-tester-0102",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "reviewItemId": "review-lee-home-control",
+    "expectVersion": 1,
+    "decision": {
+      "state": "done",
+      "outcome": "Control of Lee Home Services checked on staging: proven (S1-75).",
+      "writeBack": { "table": "business_setup", "controlProven": true }
+    }
+  },
+  "outcome": {
+    "error": "stagingOnly"
+  }
+}

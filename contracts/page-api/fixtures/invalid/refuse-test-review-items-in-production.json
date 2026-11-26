@@ -1,0 +1,29 @@
+{
+  "call": "testReviewItems",
+  "given": {
+    "now": "2026-10-20T14:00:00Z",
+    "environment": "production",
+    "after": ["tool-api/fixtures/control-team-review.json"],
+    "note": "Refused: test-review-items.json's exchange with its one fault, run in production. The staging review page's listing is staging's only (BP 9.4), so a production answer that lists any review item is refused, and the only answer there is stagingOnly (test-review-items-in-production.json). Run on staging, the same exchange is accepted (test-review-items.json)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-staging-review-tester-0001",
+      "traceId": "trace-page-tester-0101",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "result": "testReviewItems",
+    "reviewItems": [
+      {
+        "reviewItemId": "review-lee-home-control",
+        "version": 1,
+        "kind": "control",
+        "businessId": "biz-lee-home-services",
+        "raisedByPersonId": "person-sam"
+      }
+    ]
+  }
+}

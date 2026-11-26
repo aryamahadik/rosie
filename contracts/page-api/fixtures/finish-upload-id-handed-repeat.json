@@ -1,0 +1,24 @@
+{
+  "call": "finishUpload",
+  "given": {
+    "now": "2026-10-19T14:31:20Z",
+    "environment": "staging",
+    "after": ["finish-upload-id-handed.json"],
+    "note": "K-21 v1.4: the page lost the first answer and sends finishUpload again for the same upload, under a new request id. uploadId is the repeat key (v1), so the answer is the first one, word for word, and nothing more is handed: the actor drops a known event id, and the event turn writes S1-10's row once (K-09 v1.14: a repeat answers repeated)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-secure-sam-0017",
+      "traceId": "trace-page-sam-0017",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "s01-placeholder-sam"
+    },
+    "uploadId": "upload-sam-id-1"
+  },
+  "outcome": {
+    "result": "accepted",
+    "uploadId": "upload-sam-id-1",
+    "purpose": "idDocument",
+    "event": { "key": "id_checked", "step": "S1-10", "ref": "upload-sam-id-1" }
+  }
+}
