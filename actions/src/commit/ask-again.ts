@@ -10,7 +10,7 @@
 //   (b) no unmapped end (K-02 v1.2 `end`: v1.8 keeps it silent) and no planner verb;
 //   (c) exactly one open question in the turn's context, and each asked part about it: an `ask` names no other question
 //       (its `questions` that one, or none), a `oneQuestion` part that chooses chooses one of its options, and a part of
-//       any other verb ended in one question is not about it;
+//       any other verb ended in one question is not about it (except none_fits, which is: T-1559 below);
 //   (f) nothing open holds a routine reply back (default 195): every core action is a text's safety outcome, and
 //       isHeld("routine") is false on the holds and unread texts the commit holds after the core actions (a hold the
 //       turn's own safety outcome opens among them). A safety outcome that was refused opens no hold and holds no
@@ -42,16 +42,16 @@
 // it, read at ask count 2, writes nothing (default 194's cap), as a second asked text does. A passed part the walk did
 // not note is not asked, as before.
 //
-// A text that fits nothing (T-1559; K-09 default 192 (a) widened by T-1557 item 3, the lead's ruling; DL-1214; the Nov 23
-// phone test's text 4): a part decide ended `none_fits` with outcome go, which the gate answers `noAction` with no limit
-// run (gate.ts default 2), counts as asked in (a), beside parts asked the same way or `noAction`, and in (c) it is about
+// A text that fits nothing (T-1559; K-09 default 192 (a) widened by T-1557 item 3, the lead's ruling; DL-1214, DL-1227;
+// K-09 default 222 as T-1557 round 2 words it; the Nov 23 phone test's text 4): a part decide ended `none_fits`, with
+// outcome go, which the gate answers `noAction` with no limit run (gate.ts default 2), or with outcome oneQuestion, which
+// the gate answers `asked`, counts as asked in (a), beside parts asked the same way or `noAction`, and in (c) it is about
 // the context's one open question: K-02's none_fits names no question (its quote and why alone), and (c) already needs
 // exactly one in the context. So at ask count 1 the question is sent once more (S13-25 rule 16: "Ask once, plainly ...
 // try once more"), the same one row and raise as for an asked part, held back by default 195 as any; at 2 or more nothing
 // is written here (default 194's cap), and the runtime's park passes the turn on (T-1557 item 2, T-1558). Conditions (b)
-// and (d) to (g) are unchanged. A none_fits part the gate answered `asked` (outcome oneQuestion) is (c)'s "part of any
-// other verb ended in one question", not about it, as before; a no_op or redact part alone is never asked. The part's
-// own answer stays `noAction` (K-09 v1 partResult): only the turn's one row and raise are added.
+// and (d) to (g) are unchanged; a no_op or redact part alone is never asked. The part's own answer stays as the gate gave
+// it (`noAction` or `asked`, K-09 v1 partResult): only the turn's one row and raise are added.
 //
 // It only reads (the request, what the commit holds, the walk's note and the one question read) and has no outside
 // effect. Nothing here logs; what it throws names a fault, never a person's words: the unit's why names the step alone,
@@ -67,9 +67,6 @@
 //      partResult: nothing changed), with its limits as run and no key given: commit.ts answers it as it answers a part
 //      waiting for the one question (its default 6), and its unit writes nothing. Its row and raise are this file's one
 //      unit, built exactly as for a part decide ended in one question (the same id, row and entry).
-//   4. (T-1559, DL-1214) Only a none_fits part answered `noAction` (outcome go) is widened in, as the card names it; one
-//      ended in one question (outcome oneQuestion, answered `asked`) keeps (c)'s rule for a verb other than ask or choose,
-//      not about the question, until T-1159's re-read gives such a part a ruling of its own.
 
 import type { Decided, GatedPart } from "../gate/framework";
 import type { CommitUnit } from "./build";
@@ -117,9 +114,13 @@ interface Candidate {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** A part the gate answered `noAction` that decide ended `none_fits` (T-1559: default 192 (a) widened). */
+/**
+ * A part decide ended `none_fits` that the gate answered `noAction` (outcome go) or `asked` (outcome oneQuestion): T-1559,
+ * default 192 (a) widened (DL-1214, DL-1227).
+ */
 function fitsNothing(decided: Decided, gated: GatedPart): boolean {
-  return gated.result === "noAction" && decided.decide.parts[gated.part]?.part.verb === "none_fits";
+  const answered = gated.result === "noAction" || gated.result === "asked";
+  return answered && decided.decide.parts[gated.part]?.part.verb === "none_fits";
 }
 
 /** (a)'s asked parts: those (c) checks against the open question, and the none_fits ones, about it by (c) alone. */
@@ -130,8 +131,8 @@ interface AskedParts {
 
 /**
  * (a): a part the gate answered `asked` for decide's one question, a passed part whose split's settler answered "ask"
- * (`settled`: T-1528), or a none_fits part the gate answered `noAction` (T-1559), every other `noAction`, none held; null
- * otherwise.
+ * (`settled`: T-1528), or a none_fits part the gate answered `noAction` or `asked` (T-1559), every other `noAction`, none
+ * held; null otherwise.
  */
 function askedParts(turn: AskedTurn, decided: Decided, settled: ReadonlySet<number>): AskedParts | null {
   const asked: number[] = [];
@@ -139,8 +140,8 @@ function askedParts(turn: AskedTurn, decided: Decided, settled: ReadonlySet<numb
   for (const gated of turn.gated) {
     if (turn.held.has(gated.part)) return null;
     const settlerAsked = gated.result === "passed" && settled.has(gated.part);
-    if (gated.result === "asked" || settlerAsked) asked.push(gated.part);
-    else if (fitsNothing(decided, gated)) noneFits.push(gated.part);
+    if (fitsNothing(decided, gated)) noneFits.push(gated.part);
+    else if (gated.result === "asked" || settlerAsked) asked.push(gated.part);
     else if (gated.result !== "noAction") return null;
   }
   return asked.length === 0 && noneFits.length === 0 ? null : { asked, noneFits };
