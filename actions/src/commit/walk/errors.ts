@@ -28,15 +28,21 @@ import { NotBuiltError } from "../../tool-api/errors";
  *     it (closed, never sent there, or not the chosen step's), or the option names none (T-1461);
  *   - givesNotStep: a step's writer gave a key its step does not give (K-01 v1 step.gives; T-1461);
  *   - settledNotInBundle: a split's bound settler answered no label of that step's branches in the turn's pinned graph,
- *     word for word (K-09 README default 191; T-1502), so the walk has no branch to take;
+ *     word for word (K-09 README default 191; T-1502), so the walk has no branch to take; or a reach settler (K-09 v1.14
+ *     default 227; T-1562) answered a label the split lacks, or "wait" at a split the event table does not list;
  *   - settledNotRows: a plain step's bound buttons settler answered neither "ask" nor rows in a step writer's shape
- *     (K-09 README default 199; T-1491), so the walk can neither ask the step nor write it as walked;
+ *     (K-09 README default 199; T-1491), so the walk can neither ask the step nor write it as walked; or a reach settler
+ *     answered no text at all (default 227);
  *   - rowNotStep: a step's writer (or its buttons settler) gave an outbox row that names another step than its own
  *     (K-05 v1.22 item 82: a writer's rows carry the writer's own step; T-1479), so the row would carry another step's
  *     line to its reader;
  *   - eventKeyAtWalk: a step's writer (or its buttons settler) gave a key a turn never gives (walk.ts EVENT_ONLY_KEYS:
- *     id_checked, given only by the ID upload on the secure page; K-09 README default 209; T-1532), naming the step and
- *     the key alone.
+ *     id_checked, given only by the ID upload on the secure page; K-09 README default 209; T-1532; and control_proven,
+ *     given only by the team's decision proving control: K-09 v1.14 default 223, T-1562), naming the step and the key
+ *     alone; or an event or resume start (K-09 v1.14 defaults 226 and 235; T-1562) names a step and a key that are no pair
+ *     of the event table (walk.ts EVENT_TABLE), so the walk would start past a step that does not wait on that key, naming
+ *     the step and the key alone. (The fault list is K-09 v1.13 default 217's, classed in tool-api/refusal.ts, so the
+ *     start's refusal takes this final fault of the event table rather than a new one.)
  */
 export type WalkFault =
   | "flowNotInBundle"

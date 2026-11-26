@@ -60,6 +60,35 @@
 // S1-09's owner branch writes S1-09's rows then S1-10's; its no-match branch S1-09's, S1-76's, then S1-10's; its helper
 // branch is refused at S1-77 (notBuilt, tells: README default 214), never stepNotInBundle at S1-75.
 //
+// The text path (T-1562; ruling T-1543 card B6; K-01 v1.1's stop; K-09 v1.14 defaults 223, 227 to 229, 234 and 235):
+//   - reach settlers (default 227; reach.ts): where a stretch stops at a split a reach settler is bound for
+//     (WalkDeps.reachSettlers; walk.ts "reaches") and no hold keeps that split back, the rows before it are built, then
+//     the settler is asked once, handed the call, the split, the turn and the rows built so far, and no part or choice.
+//     A label: the split is written as walked (writingOf "step", never "answer": no question closed, its tells kept, its
+//     writer run as a walked step's), and the walk goes on from that branch, holds re-checked for each later step as
+//     after a buttons settler's stretch. "wait" (S1-32 only): a waitsOnEvent stop, nothing written for the split. "ask":
+//     the split asked as any step the walk stops at. Anything else, a refusal or a failed read: nothing written. With
+//     none bound, the split stops as today.
+//   - asks-by-words stops (default 228): a plain step whose stop is asksByWords is asked as default 10 asks a buttons
+//     step (one open question with no options and no read-back, its safe default if it has a card, and one quick reply
+//     naming the step and line 0), even when a later line from Rosie carries buttons (a read-back: R38), and no buttons
+//     settler is asked there; a step whose stop is waitsOnEvent stops as default 209 does, naming the field's keys.
+//   - asks-by-words answers (defaults 228 and 116; default 22 below): an option in default 116's shape (its choiceId the
+//     open question's own id, which is its question) at a step whose stop in the pinned graph is asksByWords starts the
+//     walk there (walk.ts WalkStart "words"): its question closed as an answered step's (default 11), its writer handed
+//     the part's choice with its fields and writing its gives and its later lines (its tells kept), then the walk on
+//     from its next. Never a button answer: such a step keeps no button labels (graph.ts).
+//   - owner-lane asks (R30; default 229): the walk asks an owner -> san step, by msg or page, whose line 0 is Rosie's to
+//     the turn's writer, when that writer is the step's who: its question and its quick reply to the turn's handle,
+//     naming the step and line 0, as default 10's are (a page step is asked by text on the text path); and after its
+//     answer the writer lane is the step's who (writerLaneOf).
+//   - the waiting-step starts (defaults 226, 234 and 235): walk.ts walks a WalkStart of kind event or resume; the writer
+//     call's type is left open to such a start in place of the part and its choice (OpenStepWriterCall: one pair or the
+//     start, never both), with every existing writer compiling and running unchanged. The gate that makes these starts
+//     and the walk's run for them (the reads, the key's rows, holds and openHoldsPort, input.zone, the writer lane the
+//     event table gives, the ask's business, the writers that take the start) are A11's: this file builds no such run,
+//     and writerLaneOf names no lane for those starts (null: an ask fails closed, recipient) until A11 does.
+//
 // A returning number's chat thread (T-1519; DL-1048, from T-1517's round 2): K-04 holds one chat thread per handle across
 // every business (0005 threads_one_chat_per_handle; MC C1) and one thread per Linq chat id (threads_linq_chat_key), so
 // S1-01's insert for a handle that already has its chat (a re-JOIN, the user's phone after T-1517's roster reset, a
@@ -211,6 +240,24 @@
 //      step the walk writes itself (S1-01's thread) gives no key of the table, so nothing else is checked. The rows of a
 //      walk that waits on an event are written exactly as those of a walk that ends its journey there would be: the
 //      walked steps' rows, in order, with nothing for the stop; holds stop it at its first routine row as for any walk.
+//  22. (T-1562; default 228) An asks-by-words answer is an option whose choiceId is its question, the open question's own
+//      id (default 116's shape, which B7 builds), whatever its branch holds (null, or the question's words standing in
+//      for a label: default 116), at a step the pinned graph holds as a plain step whose stop is asksByWords. Such an
+//      option at any other step is read as before: a branch named starts as a chosen branch or a button answer, and one
+//      with no branch is refused branchNotInBundle, now once the graph is read rather than before (the read is needed
+//      to know the step's stop); any other option with no branch is still refused before any read.
+//  23. (T-1562; R2 "its gives and its later lines") The answered asks-by-words step is written with its tells kept,
+//      unlike an answered split's or buttons step's (default 9: their message went out when asked): its line 0 went out
+//      when it was asked, and its later lines (S1-23's line 2) are its writer's rows, naming their lines (default 16). So
+//      a step that tells someone needs a writer even when it gives nothing: S1-77 with no writer is refused notBuilt
+//      (tells), as K-01 v1.1 default 22 and K-09 default 214 keep it until T-635c.
+//  24. (T-1562; R30) An owner-lane ask reads line 0's two lanes alone (graph.ts firstLine: `from` san, `to` the writer
+//      lane), and the step's own lanes (`who` the writer lane, `to` san, `via` msg or page). Every other rule of default
+//      10 holds: a split needs its card, a card's Clock must be step 9's default, and the question goes to the turn's
+//      own handle and person. A step from Rosie to the writer is asked by msg alone, as before.
+//  25. (T-1562; default 227) A reach-settled split is held back as any routine step is (firstHeld, each step of its own
+//      class after the part's first): a hold that keeps it back asks no settler and writes nothing of it or after it.
+//      The rows before it are built before its settler is asked, so the settler reads them (RowsBuilt, copies).
 
 import type { Choice, Decided, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
@@ -236,8 +283,18 @@ import type {
 import { buttonsAnswer, type ButtonsSettler, type ButtonsSettlers, type RowsBuilt } from "./buttons";
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import { flowGraphOf, flowOfStep, type FlowGraph, type FlowLetter, type GraphStep } from "./graph";
+import { reachAnswer, type ReachSettler, type ReachSettlers } from "./reach";
 import { isSplitStep, noteSettlerAsked, settledBranch, type StepSettler, type StepSettlers } from "./settle";
-import { eventKeysIn, walkStretchFrom, type Stretch, type WalkStart, type Walked } from "./walk";
+import {
+  eventKeysIn,
+  walkStretchFrom,
+  type ReachAnswer,
+  type Stretch,
+  type WaitingStart,
+  type WalkOptions,
+  type WalkStart,
+  type Walked,
+} from "./walk";
 
 /** A bundle id as the turn row pins it (K-05 v1 turn.bundleId; K-01 v1 bundleId). */
 export interface BundleIdOf {
@@ -320,14 +377,46 @@ export interface StepWriterCall<Repo = unknown> {
   readonly part: PassedPart;
   /** The offered choice the part chose or entered (an answer's: its option, with the branch it chose). */
   readonly choice: Choice;
+  /** No waiting step's start: a call carries the part and its choice, or the start (StartedWriterCall), never both. */
+  readonly start?: undefined;
   readonly writer: WriterContext<Repo>;
 }
+
+/**
+ * One call of a step's writer on a walk a waiting step's start began (T-1562; K-09 v1.14 defaults 234 (1) and 235): the
+ * event's or the resume's start in place of the part and its choice, which such a turn does not have (none is made up);
+ * the writer context's `why` names the waiting step with no choice. A11 makes these calls.
+ */
+export interface StartedWriterCall<Repo = unknown> {
+  /** The call's repo, inside its transaction and business scope (CommitTurnContext.repo): read through, never written. */
+  readonly repo: Repo;
+  /** The step written, as the walk reads it from the turn's pinned graph. */
+  readonly step: GraphStep;
+  /** The waiting step's start (walk.ts WaitingStart): its step and key, and an event's ref. */
+  readonly start: WaitingStart;
+  readonly part?: undefined;
+  readonly choice?: undefined;
+  readonly writer: WriterContext<Repo>;
+}
+
+/**
+ * A step writer's call left open to a waiting step's start (T-1562; default 234 (1)): the part and its choice
+ * (StepWriterCall) or the start (StartedWriterCall), never both; `call.start === undefined` tells them apart.
+ */
+export type OpenStepWriterCall<Repo = unknown> = StepWriterCall<Repo> | StartedWriterCall<Repo>;
 
 /**
  * One step's own writer (DL-961 ruling 2): what that step writes when the walk walks it. It only reads, and never
  * writes: the commit writes what writesOf returns. What it throws fails the call closed, as the walk's own refusals do.
  */
 export type StepWriter<Repo = unknown> = (call: StepWriterCall<Repo>) => Promise<StepRows>;
+
+/**
+ * A step writer that also takes a waiting step's start (T-1562; default 234 (1)): bindable wherever a StepWriter is (it
+ * takes every call a StepWriter takes), and the only kind a walk from an event or resume start may call. One that cannot
+ * write from the start refuses by throwing, and the call fails closed (default 216).
+ */
+export type OpenStepWriter<Repo = unknown> = (call: OpenStepWriterCall<Repo>) => Promise<StepRows>;
 
 /** The read-only step writers, by step id: the writer bound to `stepId`, or null when none is. */
 export type StepWriters<Repo = unknown> = (stepId: string) => StepWriter<Repo> | null;
@@ -354,6 +443,13 @@ export interface WalkDeps<Repo = unknown> {
    * none for that step, the walk is exactly as before.
    */
   readonly buttonsSettlers?: ButtonsSettlers<Repo>;
+  /**
+   * The read-only reach settlers by step id (K-09 v1.14 default 227; T-1562; reach.ts), handed in as `settlers` is. The
+   * walk asks one where it reaches a split bound for it, before atSplit, once the rows before that split are built, with
+   * no part or choice, when no hold keeps the split back. Left out, or binding none for a split, the walk stops there as
+   * before.
+   */
+  readonly reachSettlers?: ReachSettlers<Repo>;
   /**
    * Where S1-01's thread write finds the handle's chat thread (T-1519; default 12), handed in as `questions` is. Left
    * out, S1-01's thread is inserted exactly as before.
@@ -440,11 +536,28 @@ function startOf(choice: Choice): WalkStart {
 }
 
 /**
- * Where the part's choice starts the walk once the turn's pinned graph is read (default 17): an option at a step the
- * graph holds as no split answers one of that step's buttons (WalkStart "button"; default 181), which the walk checks
- * against the step's labels; any other start is the choice's own (startOf).
+ * Whether an option has default 116's shape (default 22): its choiceId is its question, the open question's own id, as
+ * B7 builds the one choice of an asks-by-words question. Whether it answers one waits for the pinned graph.
  */
-function startIn(graph: FlowGraph, choice: Choice, start: WalkStart): WalkStart {
+function wordsShaped(choice: Choice): boolean {
+  return choice.kind === "option" && choice.question !== null && choice.choiceId === choice.question;
+}
+
+/**
+ * Where the part's choice starts the walk once the turn's pinned graph is read (defaults 17 and 22): an option in
+ * default 116's shape at a step the graph holds as a plain step whose stop is asksByWords answers it (WalkStart
+ * "words"; K-09 v1.14 default 228); an option at a step the graph holds as no split answers one of that step's buttons
+ * (WalkStart "button"; default 181), which the walk checks against the step's labels; any other start is the choice's
+ * own (startOf, read here when `named` is null, so an option with no branch is refused here).
+ */
+function startIn(graph: FlowGraph, choice: Choice, named: WalkStart | null): WalkStart {
+  if (wordsShaped(choice)) {
+    const asked = graph.step(choice.step);
+    if (asked !== null && !asked.split && asked.stop?.kind === "asksByWords") {
+      return { kind: "words", step: asked.id };
+    }
+  }
+  const start = named ?? startOf(choice);
   if (choice.kind !== "option" || start.kind !== "branch") return start;
   const step = graph.step(start.step);
   if (step === null || step.split) return start;
@@ -472,12 +585,13 @@ function settlerFor<Repo>(deps: WalkDeps<Repo>, choice: Choice): StepSettler<Rep
 }
 
 /**
- * One step whose rows the walk writes: the step an answer answers (a split, or a plain step's buttons: T-1480), a step
- * walked (on a list, or on the chosen branch), or the step the walk stops at.
+ * One step whose rows the walk writes: the step an answer answers (a split, or a plain step's buttons: T-1480), an
+ * asks-by-words step answered (T-1562: its question closed, its tells kept: default 23), a step walked (on a list, on
+ * the chosen branch, or a split a reach settler settled: default 227), or the step the walk stops at.
  */
 interface Writing {
   readonly step: GraphStep;
-  readonly as: "answer" | "step" | "asks" | "waits";
+  readonly as: "answer" | "wordsAnswer" | "step" | "asks" | "waits";
 }
 
 /**
@@ -486,18 +600,23 @@ interface Writing {
  * event (waitsOnEvent: default 21) adds nothing for its stop: its step is the walk's last move, written by its own
  * writer as any step walked, so no question, question row or clock row is made for it. An answer writes each step of
  * its chosen branch through that step's writer, so a branch step the bundle does not hold (walk.ts default 1) is
- * refused here, and an effect no step writes is not built (effect).
+ * refused here, and an effect no step writes is not built (effect). A split a reach settler settled is written as
+ * walked, never as an answer (default 227: no question closed, its tells kept), and its branch read as a chosen one's.
+ * A walk that stops at a split a reach settler is asked at ("reaches") adds nothing for it here: the settler answers it.
  */
 function writingOf(graph: FlowGraph, walked: Walked): Writing[] {
   const writing = walked.moves.map((move): Writing => {
-    if (move.kind === "step") return { step: move.step, as: move.answered === undefined ? "step" : "answer" };
+    if (move.kind === "step") {
+      if (move.answered === undefined) return { step: move.step, as: "step" };
+      return { step: move.step, as: move.answered === null ? "wordsAnswer" : "answer" };
+    }
     const { split, branch } = move;
     for (const id of branch.steps) {
       if (graph.step(id) === null) throw new WalkRefusedError("stepNotInBundle", [id]);
     }
     const other = branch.effects.find((effect) => !WRITTEN_EFFECTS.includes(effect.kind));
     if (other !== undefined) throw new WalkNotBuiltError("effect", [split.id, other.kind]);
-    return { step: split, as: "answer" };
+    return { step: split, as: move.reached === true ? "step" : "answer" };
   });
   const { stop } = walked;
   if (stop.kind === "asks" || stop.kind === "waits") writing.push({ step: stop.step, as: stop.kind });
@@ -506,13 +625,37 @@ function writingOf(graph: FlowGraph, walked: Walked): Writing[] {
 
 /**
  * The writer's lane (defaults 4 and 8): who the entered step is from, when it is written to Rosie (S1-01: owner); for an
- * answer, whom Rosie asked the answered step of (S1-02, and S1-04's buttons: owner).
+ * answer, whom Rosie asked the answered step of (S1-02, and S1-04's buttons: owner), or, for an owner-lane step written
+ * to Rosie, its who (R30; K-09 v1.14 default 229: S1-23's, S1-12's and S1-21's answers: owner). A waiting step's start
+ * names none here: its lane is the event table's, which A11 gives (defaults 226 and 235).
  */
 function writerLaneOf(graph: FlowGraph, start: WalkStart): string | null {
+  if (start.kind === "event" || start.kind === "resume") return null;
   const entered = graph.step(start.step);
   if (entered === null) return null;
-  if (start.kind !== "step") return entered.who === "san" ? entered.to : null;
+  if (start.kind !== "step" && entered.who === "san") return entered.to;
   return entered.to === "san" ? entered.who : null;
+}
+
+/** The ways an owner-lane step is asked by text (R30): by msg, or a page step asked by text on the text path. */
+const OWNER_LANE_VIAS: readonly string[] = ["msg", "page"];
+
+/**
+ * Whether the walk may ask `step` of the turn's writer by text (defaults 4 and 24): a step from Rosie to that writer by
+ * msg, as before; or an owner-lane step (R30; K-09 v1.14 default 229), written by that writer to Rosie by msg or page,
+ * whose line 0 is Rosie's to that writer. With no writer lane, none.
+ */
+function askedOfWriter(step: GraphStep, writerLane: string | null): boolean {
+  if (writerLane === null) return false;
+  if (step.who === "san") return step.via === "msg" && step.to === writerLane;
+  const line = step.firstLine;
+  return (
+    step.who === writerLane &&
+    step.to === "san" &&
+    OWNER_LANE_VIAS.includes(step.via) &&
+    line?.from === "san" &&
+    line.to === writerLane
+  );
 }
 
 /** Default 131's row ids for one walk: `<kind>-<step>-<turn key>-<n>`. */
@@ -679,13 +822,12 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
 
   /**
    * The step the walk stops at, asking the turn's writer (default 4): a split's question with its card's safe default,
-   * buttons or none (default 10), or a plain step's buttons' question, and the quick reply asking it, naming that step
-   * and line 0 (default 15).
+   * buttons or none (default 10), a plain step's buttons' question, or an asks-by-words step's question (default 228),
+   * and the quick reply asking it, naming that step and line 0 (default 15). It asks a step from Rosie to the writer by
+   * msg, or an owner-lane step (default 24: R30).
    */
   const asked = (step: GraphStep): void => {
-    if (step.who !== "san" || step.via !== "msg" || run.writerLane === null || step.to !== run.writerLane) {
-      throw new WalkNotBuiltError("recipient", [step.id]);
-    }
+    if (!askedOfWriter(step, run.writerLane)) throw new WalkNotBuiltError("recipient", [step.id]);
     const { card } = step;
     if (step.split && card === null) throw new WalkRefusedError("stepNotWellFormed", [step.id]);
     if (card !== null && card.clock?.from !== "step9Default") throw new WalkNotBuiltError("clock", [step.id]);
@@ -783,7 +925,7 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
         asked(step);
         continue;
       }
-      if (each.as === "answer") await answered(step);
+      if (each.as === "answer" || each.as === "wordsAnswer") await answered(step);
       if (by === "walk") {
         for (const key of step.gives) if (key === THREAD) await thread(step);
       } else {
@@ -823,6 +965,51 @@ function buttonsSettlingOf<Repo>(deps: WalkDeps<Repo>, stretch: Stretch): Button
   if (step.split || step.branches.length > 0 || step.buttons === 0) return null;
   const settler = deps.buttonsSettlers(step.id);
   return settler === null ? null : { step, settler, walkOn };
+}
+
+/** The reach settlers of one walk (default 227), each found once by step id, so the walk and its rows agree. */
+interface Reaching<Repo> {
+  /** What the walk is told of the graph's splits (walk.ts WalkOptions): a split it asks a reach settler at. */
+  readonly options: WalkOptions;
+  /** The reach settler bound to `stepId`, or null when none is. */
+  settlerOf(stepId: string): ReachSettler<Repo> | null;
+}
+
+function reachingOf<Repo>(deps: WalkDeps<Repo>): Reaching<Repo> {
+  const found = new Map<string, ReachSettler<Repo> | null>();
+  const settlerOf = (stepId: string): ReachSettler<Repo> | null => {
+    if (deps.reachSettlers === undefined) return null;
+    if (!found.has(stepId)) found.set(stepId, deps.reachSettlers(stepId));
+    return found.get(stepId) ?? null;
+  };
+  return { options: { reaches: (stepId) => settlerOf(stepId) !== null }, settlerOf };
+}
+
+/** A stretch's stop that a bound reach settler settles (default 227): the split, its settler and the walk on. */
+interface ReachSettling<Repo> {
+  readonly step: GraphStep;
+  readonly settler: ReachSettler<Repo>;
+  readonly reach: (answer: ReachAnswer) => Stretch;
+}
+
+/**
+ * The reach settler bound to the split a stretch stops at (walk.ts "reaches": default 227), or null for any other stop.
+ * Holds are the caller's to check.
+ */
+function reachSettlingOf<Repo>(reaching: Reaching<Repo>, stretch: Stretch): ReachSettling<Repo> | null {
+  const { stop, reach } = stretch;
+  if (reach === null || stop.kind !== "reaches") return null;
+  const settler = reaching.settlerOf(stop.step.id);
+  return settler === null ? null : { step: stop.step, settler, reach };
+}
+
+/**
+ * The steps of a stretch whose rows what is open may keep back, in order (default 25): the steps it writes, then the
+ * split it stops at when a reach settler is asked there, which is held back as any routine step is.
+ */
+function heldSteps(stretch: Stretch, writing: readonly Writing[]): string[] {
+  const ids = writing.map((each) => each.step.id);
+  return stretch.stop.kind === "reaches" ? [...ids, stretch.stop.step.id] : ids;
 }
 
 /**
@@ -872,23 +1059,24 @@ interface Walking<Repo> {
   readonly walked: Stretch;
   readonly questions: WalkQuestions<Repo> | null;
   readonly why: Why;
+  /** The walk's reach settlers (default 227), as its first stretch was walked with them. */
+  readonly reaching: Reaching<Repo>;
 }
 
 /**
  * The part's writes from its walk: what is open stops the walk at its first routine row (STATE note 1). Where a stretch
  * stops at a plain step with buttons whose buttons settler is bound and no hold keeps that step back (default 199), the
  * rows before the step are built and the settler is asked once: "ask" asks the step as today; rows write it as walked
- * and the walk goes on, its next stretch's holds re-checked. Any other stretch is written as before.
+ * and the walk goes on, its next stretch's holds re-checked. Where a stretch stops at a split whose reach settler is
+ * bound and no hold keeps that split back (default 227), the rows before the split are built and the settler is asked
+ * once, with no part or choice; the walk goes on as it answers (a branch written as walked, "wait", or "ask"), its next
+ * stretch's holds re-checked. Any other stretch is written as before.
  */
 async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promise<UnitWrites> {
-  const { part, context, open, choice, graph, start, walked, questions, why } = walking;
+  const { part, context, open, choice, graph, start, walked, questions, why, reaching } = walking;
   let stretch: Stretch = walked;
   let writing: readonly Writing[] = writingOf(graph, stretch);
-  let heldAt = firstHeld(
-    writing.map((each) => each.step.id),
-    holdClassOf(part.part, choice),
-    open,
-  );
+  let heldAt = firstHeld(heldSteps(stretch, writing), holdClassOf(part.part, choice), open);
 
   const turnKey = (deps.turnKey ?? ((turn: TurnRow) => turn.id))(context.turn);
   if (turnKey === "") throw new WalkRefusedError("noTurnKey");
@@ -906,9 +1094,29 @@ async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promi
   };
   const rows = rowBuilderOf(run);
   for (;;) {
-    const settling = heldAt === null ? buttonsSettlingOf(deps, stretch) : null;
+    if (heldAt !== null) {
+      await rows.write(writing.slice(0, heldAt));
+      break;
+    }
+    const reached = reachSettlingOf(reaching, stretch);
+    if (reached !== null) {
+      // The rows before the split, then its reach settler, once: no part and no choice (default 227).
+      await rows.write(writing);
+      const answer = await reachAnswer(reached.settler, {
+        repo: context.repo,
+        businessId: context.businessId,
+        step: reached.step,
+        turn: context,
+        rows: rows.soFar(),
+      });
+      stretch = reached.reach(answer);
+      writing = writingOf(graph, stretch);
+      heldAt = firstHeldOn(heldSteps(stretch, writing), open);
+      continue;
+    }
+    const settling = buttonsSettlingOf(deps, stretch);
     if (settling === null) {
-      await rows.write(heldAt === null ? writing : writing.slice(0, heldAt));
+      await rows.write(writing);
       break;
     }
     // The rows before the step (its asked entry is the stretch's last), then its settler, once.
@@ -930,10 +1138,7 @@ async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promi
     rows.settled(step, settled);
     stretch = walkOn();
     writing = writingOf(graph, stretch);
-    heldAt = firstHeldOn(
-      writing.map((each) => each.step.id),
-      open,
-    );
+    heldAt = firstHeldOn(heldSteps(stretch, writing), open);
   }
   const { built } = rows;
   return {
@@ -994,6 +1199,7 @@ async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo
   }
   const { branch } = settled;
   const start: WalkStart = { kind: "branch", step: split.id, branch };
+  const reaching = reachingOf(deps);
   return unitOf(deps, {
     part,
     context,
@@ -1002,9 +1208,10 @@ async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo
     choice: { ...choice, branch },
     graph,
     start,
-    walked: walkStretchFrom(graph, start),
+    walked: walkStretchFrom(graph, start, reaching.options),
     questions,
     why: { step: split.id, choice: branch },
+    reaching,
   });
 }
 
@@ -1021,9 +1228,10 @@ async function walkWrites<Repo>(
   const { choice } = part;
   if (choice === null) throw new WalkNotBuiltError("verb", [part.part.verb]);
   if (choice.target.businessId !== context.businessId) throw new WalkRefusedError("businessNotInScope");
-  // With no settler bound to the step an option names, the start is the choice's own, found before any read.
+  // With no settler bound to the step an option names, the start is the choice's own, found before any read, unless it
+  // has default 116's shape: whether it answers an asks-by-words step is the pinned graph's (default 22).
   const settler = settlerFor(deps, choice);
-  const named = settler === null ? startOf(choice) : null;
+  const named = settler === null && !wordsShaped(choice) ? startOf(choice) : null;
 
   // The walk, on the turn's pinned graph, read afresh on every run: a step or branch it lacks is refused here.
   const flow = flowOfStep(choice.step, decided.context.flow);
@@ -1037,13 +1245,15 @@ async function walkWrites<Repo>(
       return settledWrites(deps, { part, context, open, texts, choice, graph, split, settler });
     }
   }
-  // An option at a step the pinned graph holds as no split answers one of its buttons (default 17).
-  const start = startIn(graph, choice, named ?? startOf(choice));
-  const walked = walkStretchFrom(graph, start);
+  // An option at a step the pinned graph holds as no split answers one of its buttons (default 17), or, in default
+  // 116's shape at an asks-by-words step, that step's question (default 22).
+  const start = startIn(graph, choice, named);
+  const reaching = reachingOf(deps);
+  const walked = walkStretchFrom(graph, start, reaching.options);
   // An answer closes its question at the version the question's row is read at: with no read bound, it is not built.
   const questions = start.kind === "step" ? null : questionsOf(deps, choice, start.step);
   const why: Why = { step: choice.step, choice: choice.branch ?? choice.label };
-  return unitOf(deps, { part, context, open, texts, choice, graph, start, walked, questions, why });
+  return unitOf(deps, { part, context, open, texts, choice, graph, start, walked, questions, why, reaching });
 }
 
 /**
