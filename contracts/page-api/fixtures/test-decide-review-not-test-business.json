@@ -1,0 +1,28 @@
+{
+  "call": "testDecideReviewItem",
+  "given": {
+    "now": "2026-10-20T14:35:00Z",
+    "environment": "staging",
+    "after": ["test-review-items.json"],
+    "note": "K-21 v1.4: Tester One's page sends a decision for an item that is not an open item of a staging test business: a business whose owner's mobile is neither on STAGING_LINQ_ALLOWLIST nor a roster test phone (K-05 v1.24 item 5). The page entry checks the item before any decision and answers notTestBusiness, the same answer as for an id that names no item, so nothing of another business's queue is learned; K-09 decideReviewItem is never called and nothing is written. The item id is a placeholder: the sample cast names no such business."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-staging-review-tester-0003",
+      "traceId": "trace-page-tester-0103",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "reviewItemId": "review-control-unlisted-owner",
+    "expectVersion": 1,
+    "decision": {
+      "state": "done",
+      "outcome": "Control checked on staging: proven (S1-75).",
+      "writeBack": { "table": "business_setup", "controlProven": true }
+    }
+  },
+  "outcome": {
+    "error": "notTestBusiness",
+    "reviewItemId": "review-control-unlisted-owner"
+  }
+}

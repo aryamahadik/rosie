@@ -1,0 +1,15 @@
+{
+  "page": {
+    "requestId": "req-staging-review-tester-0002",
+    "traceId": "trace-page-tester-0102",
+    "sessionToken": null,
+    "linkCode": null
+  },
+  "reviewItemId": "review-lee-home-control",
+  "expectVersion": 1,
+  "decision": {
+    "state": "done",
+    "outcome": "Control of Lee Home Services checked on staging: proven (S1-75).",
+    "writeBack": { "table": "business_setup", "controlProven": true }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "call": "testReviewItems",
+  "given": {
+    "now": "2026-10-20T14:00:00Z",
+    "environment": "production",
+    "after": [],
+    "note": "K-21 v1.4: the same request as test-review-items.json reaches production. The staging review page's listing is staging's only (BP 9.4: 'Never in production'), so it reads nothing and answers stagingOnly; on production Rosie's team, Jay and the CTO (Q-18), work from the team console."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-staging-review-tester-0001",
+      "traceId": "trace-page-tester-0101",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "error": "stagingOnly"
+  }
+}

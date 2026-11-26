@@ -6,19 +6,24 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type * as K21 from "../../../contracts/generated/page-api/page-api.v1";
+import type * as K21v14 from "../../../contracts/generated/page-api/page-api.v1.4";
 import { ToolApiMockError, loadToolApiMock } from "../../../contracts/mock/mock.mjs";
 import {
   PAGE_API_PATH,
   PAGE_CALLS,
+  REVIEW_TEST_CALLS,
   envelopeOf,
   isPageCall,
   isPageError,
   pagePathOf,
   type ErrorOf,
+  type KnownCall,
+  type KnownOutcomeOf,
   type OutcomeOf,
   type PageCall,
   type RequestOf,
   type ResponseOf,
+  type ReviewTestCall,
 } from "./calls";
 import { PageApiError, createPageApiClient, pageEntryTransport, type PageApiTransport } from "./client";
 import { mockTransport } from "./test-support";
@@ -306,5 +311,44 @@ describe("the transport to the page entry", () => {
     const down = new Error("the page entry could not be reached");
     const transport = pageEntryTransport({ baseUrl: BASE_URL, send: () => Promise.reject(down) });
     expect(await failureOf(send(transport, "signOut", SIGN_OUT.request))).toBe(down);
+  });
+});
+
+describe("K-21 v1.4's two staging-only review calls are known by name and type, not sent (T-1565)", () => {
+  it("are the two names v1.4's callName adds to v1.3's, and both are in v1.4's stagingOnlyCall", () => {
+    const v14 = readJson("page-api.v1.4.schema.json") as {
+      $defs: { callName: { enum: string[] }; stagingOnlyCall: { enum: string[] } };
+    };
+    const v13 = readJson("page-api.v1.3.schema.json") as { $defs: { callName: { enum: string[] } } };
+    expect([...REVIEW_TEST_CALLS]).toEqual(
+      v14.$defs.callName.enum.filter((name) => !v13.$defs.callName.enum.includes(name)),
+    );
+    for (const call of REVIEW_TEST_CALLS) expect(v14.$defs.stagingOnlyCall.enum, call).toContain(call);
+  });
+
+  it("are not K-21 v1 calls, so the client refuses to send them", async () => {
+    for (const call of REVIEW_TEST_CALLS) {
+      expect(isPageCall(call), call).toBe(false);
+      const transport = mockTransport("staging");
+      const failed = await failureOf(send(transport, call as PageCall, {}));
+      expect(failed, call).toBeInstanceOf(PageApiError);
+      expect(failed, call).toMatchObject({ code: "unknownCall", call: null });
+      expect(transport.sent, call).toEqual([]);
+    }
+  });
+
+  it("types each one's outcome with v1.4's generated types, and a v1 call's still with v1's", () => {
+    expectTypeOf<ReviewTestCall>().toEqualTypeOf<"testReviewItems" | "testDecideReviewItem">();
+    expectTypeOf<KnownCall>().toEqualTypeOf<PageCall | ReviewTestCall>();
+    expectTypeOf<KnownOutcomeOf<"testReviewItems">>().toEqualTypeOf<
+      K21v14.TestReviewItemsExchange["outcome"]
+    >();
+    expectTypeOf<KnownOutcomeOf<"testDecideReviewItem">>().toEqualTypeOf<
+      K21v14.TestDecideReviewItemExchange["outcome"]
+    >();
+    expectTypeOf<KnownOutcomeOf<"fireNow">>().toEqualTypeOf<OutcomeOf<"fireNow">>();
+    expectTypeOf<KnownOutcomeOf<"finishUpload">>().toEqualTypeOf<K21.FinishUploadExchange["outcome"]>();
+    expectTypeOf<{ error: "stagingOnly" }>().toExtend<KnownOutcomeOf<"testReviewItems">>();
+    expectTypeOf<{ error: "stagingOnly" }>().toExtend<KnownOutcomeOf<"testDecideReviewItem">>();
   });
 });

@@ -1,0 +1,33 @@
+{
+  "call": "testDecideReviewItem",
+  "given": {
+    "now": "2026-10-20T14:30:00Z",
+    "environment": "staging",
+    "after": ["test-review-items.json"],
+    "note": "K-21 v1.4 (ruling T-1543 card A8 (3); R33): Tester One read the decision back on the staging review page and sends it, at the version testReviewItems read. The item is an open item of a staging test business (K-05 v1.24 items 5 and 4), so the page entry calls K-09 v1 decideReviewItem with caller.kind console and the test console's member, person-check-tester (K-05 v1.12 default 105; K-21 default 2), never Tester One, who holds no team row; the typed write-back sets K-23 v1 business_setup.control_proven_at with control_proven_via team_check in the same commit. The answer is K-09 v1 control-team-decided.json's, at this time. The K-08 entry names person-check-tester as its actor, and the call's pageRequest span names Tester One's session by its id (session-tester-one), never its token. No page is sent to anyone (BP 9.4). What follows, the control_proven event to Sam's chat handle actor, is the runtime's (E10, through the event door), not a field of this answer. On production, Rosie's team decides through teamDecideReviewItem instead (team-review-decide.json)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-staging-review-tester-0002",
+      "traceId": "trace-page-tester-0102",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "reviewItemId": "review-lee-home-control",
+    "expectVersion": 1,
+    "decision": {
+      "state": "done",
+      "outcome": "Control of Lee Home Services checked on staging: proven (S1-75).",
+      "writeBack": { "table": "business_setup", "controlProven": true }
+    }
+  },
+  "outcome": {
+    "state": "done",
+    "decidedAt": "2026-10-20T14:30:00Z",
+    "written": [
+      { "table": "review_items", "rowId": "review-lee-home-control", "version": 2 },
+      { "table": "business_setup", "rowId": "biz-lee-home-services", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "call": "finishUpload",
+  "given": {
+    "now": "2026-10-19T14:31:00Z",
+    "environment": "staging",
+    "after": ["upload-id-document.json"],
+    "note": "Refused: finish-upload-id-handed.json's exchange with its one fault, the accepted answer given for a price-list photo. Only an ID document's upload is handed on as id_checked for S1-10 (ruling T-1543 card A8 (1)); every other purpose keeps v1's stored answer with served null and rides in an answer by its upload id. With purpose idDocument the same exchange is accepted (finish-upload-id-handed.json)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-secure-sam-0016",
+      "traceId": "trace-page-sam-0016",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "s01-placeholder-sam"
+    },
+    "uploadId": "upload-sam-id-1"
+  },
+  "outcome": {
+    "result": "accepted",
+    "uploadId": "upload-sam-id-1",
+    "purpose": "pricePhoto",
+    "event": { "key": "id_checked", "step": "S1-10", "ref": "upload-sam-id-1" }
+  }
+}
