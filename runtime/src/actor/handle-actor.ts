@@ -64,6 +64,11 @@
 // ./staging-reset.ts; DL-944 card A): its stored state cleared as that file says, then the safety read built again with no
 // state or name in memory, and the alarm set from the stored schedule.
 //
+// An event (T-1563; ruling T-1543 card A18; K-09 v1.14): the actor's own door (`acceptEvent`, over ./event-door.ts) stores
+// an event the caller sealed (the owner's ID upload landing, Rosie's team's decision), drops a known event id as a text's,
+// and queues it with the lease as a turn of its own (lease.ts): no safety read, no batch window, no PostgreSQL-down
+// reading, since it holds no text, and no K-06 service or chat id on its entry.
+//
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). This file opens no
 // sealed box: the safety read does, and the PostgreSQL-down path, to read a STOP or a START, each with the handle's key.
 // Never logged: a word, a phone number, a key, a sealed body.
@@ -82,6 +87,7 @@ import {
 import { bundleIdOf } from "../bundle/values";
 import { ActorClocks, type DueClock, type FireBy, type FireReport } from "../clocks";
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
+import { actorNameOf } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
 import { setOutageHost } from "../outage/ai/outage";
 import { DbOutage, STOP_OR_START_CALL, type OutageView } from "../outage/db";
@@ -125,6 +131,12 @@ import {
   type SafetyTimerCopy,
   type StoppedCopy,
 } from "./copies";
+import {
+  EventDoorRefusal,
+  sealedEventProblem,
+  writeEventToInbox,
+  type SealedEventHandoff,
+} from "./event-door";
 import {
   createInboxTables,
   markReceiptSeen,
@@ -473,6 +485,37 @@ export class HandleActor extends DurableObject {
       answer = await this.passReceipt(handoff);
     }
     return answer;
+  }
+
+  /**
+   * The actor's event door (T-1563; ruling T-1543 card A18; K-09 v1.14 "Who reads v1.14", the runtime's event door): an
+   * event sealed by ./event-door.ts `handEvent` on the caller's side (A12's page call, E10's decision). Its clear fields and
+   * its box's form are checked again (a fault throws EventDoorRefusal naming it, with nothing stored); then, in one step,
+   * the event is stored in the ordered inbox and queued for a turn of its own (lease.ts `queueEvent`), or answered
+   * "duplicate" with nothing stored for a known event id, as a text's is. It takes no safety read, enters no batch window
+   * and is followed by no PostgreSQL-down reading: it holds no text. Its trace's count goes on after the caller's places
+   * (`seqBefore`), and the lease gives it its turn when it is first in line.
+   */
+  async acceptEvent(handoff: SealedEventHandoff): Promise<StoreAnswer> {
+    const problem = sealedEventProblem(handoff);
+    if (problem !== null) throw new EventDoorRefusal(problem);
+    // The staging-only reset of a listed test handle's actor, first (T-1452), as for a text's hand-off.
+    const reset = this.resetIfListed(actorNameOf(handoff.event.handle));
+    if (reset !== null) await reset;
+    const written = this.ctx.storage.transactionSync(() => {
+      const stored = writeEventToInbox(this.ctx.storage, handoff);
+      if (stored.answer === "written") this.lease.queueEvent(stored.seq, handoff.event.eventId);
+      return stored.answer;
+    });
+    if (written === "written") {
+      const seqBefore = handoff.seqBefore;
+      this.beginTraceSeq({
+        traceId: handoff.event.traceId,
+        ...(typeof seqBefore === "number" ? { seqBefore } : {}),
+      });
+      await this.lease.kick();
+    }
+    return written;
   }
 
   /**
@@ -1002,7 +1045,7 @@ export class HandleActor extends DurableObject {
    * hand-off built by hand), here and in the actor's storage. A trace this actor has begun already (a second event handed
    * in under one trace id) goes on from the count kept for it, never back. Only the newest TRACE_SEQ_KEPT traces are kept.
    */
-  private beginTraceSeq(handoff: SealedHandoff): void {
+  private beginTraceSeq(handoff: Pick<SealedHandoff, "traceId" | "seqBefore">): void {
     const before: unknown = handoff.seqBefore;
     const taken = typeof before === "number" && Number.isInteger(before) && before > 0 ? before : 0;
     try {

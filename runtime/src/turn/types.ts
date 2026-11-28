@@ -186,11 +186,32 @@ export interface CoreOnlyInput {
   kind: "coreOnly";
 }
 
-/** K-09 v1 `gateAndCommit.request`: one commit under the turn id, with the turn's core actions in order. */
+/**
+ * K-09 v1.14 `gateAndCommit.event` (T-1563; default 221): an event the person's own chat handle actor runs as a turn of its
+ * own, with no texts (A18). `key` and `step` are a pair of the event table (`id_checked` at S1-10, `control_proven` at
+ * S1-32); `ref` is the id of the key's own source (the upload's, the review item's), never an object key, a code or a
+ * name; `service` is the handle's phone's Linq service (K-05 v1.2 readTurnState `phone.chatWay`) and `zone` the turn's
+ * directory's, each read once at the event turn's first run and kept for a rerun (default 222). Only labels of it go into
+ * a span (the key and the step); the ref never does.
+ */
+export interface EventInput {
+  kind: "event";
+  eventId: string;
+  key: string;
+  step: string;
+  ref: string;
+  service: string;
+  zone: string;
+}
+
+/**
+ * K-09 v1 `gateAndCommit.request`: one commit under the turn id, with the turn's core actions in order. An event's turn
+ * (v1.14) commits no core action, and its turn carries one event id, no joined trace, and neither a service nor a chat id.
+ */
 export interface GateAndCommitRequest {
   caller: TurnCaller;
   turn: CommitTurnRef;
-  input: DecidedInput | CoreOnlyInput;
+  input: DecidedInput | CoreOnlyInput | EventInput;
   core: CoreAction[];
   now: string;
 }
@@ -692,6 +713,15 @@ export interface TurnParty {
 /** The handle's directory: who an actor's handle is (K-04 handles, persons and roles). Null: not known, so no turn runs. */
 export interface TurnDirectory {
   partyOf(request: { actorName: string; handle: HandleRef }): Promise<TurnParty | null>;
+  /**
+   * The handle's phone service (T-1563; K-09 v1.14 default 221; K-05 v1.24 item 92 and default 235): K-05 v1.2 item 26's
+   * readTurnState `phone.chatWay` for the handle the directory named (K-04 handles.id), run on the runtime side as
+   * rosie_job in a read-only transaction of its own on 1 connection, never on the gate's: imessage, rcs or sms, or null
+   * when the handle has no phone row or no stored way. An event's turn reads it once, at its first run. A throw is a read
+   * that could not be made (the turn runs again at its lapse). Left out where no read is bound: answered as null, so an
+   * event's turn runs nothing (K-09 v1.14 open gap 214's default).
+   */
+  chatWayOf?(request: { handleId: string }): Promise<string | null>;
 }
 
 /**

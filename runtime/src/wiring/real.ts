@@ -343,6 +343,7 @@ import type {
 } from "@rosie/db/repo/outbox";
 import type { SendStateOutcome, SendStateRequest, SendStateResponse } from "@rosie/db/repo/send-state";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
+import type { ReadTurnStateOutcome, ReadTurnStateRequest } from "@rosie/db/repo/turn-state";
 import type {
   HandleTargetsOutcome,
   HandleTargetsRequest as K05HandleTargetsRequest,
@@ -1349,12 +1350,38 @@ export interface BundleSafetyLines extends BundleSafety {
 /** The handle's stopped flag, as the outage line asks it (SafetyDeps.isStopped; arch 11 line 566), by actor name. */
 export type StoppedFlagRead = SafetyDeps["isStopped"];
 
+/**
+ * The event turn's service read (T-1563; K-09 v1.14 default 221; K-05 v1.24 item 92 and default 235): K-05 v1.2 item 26's
+ * readTurnState for the handle (K-04 handles.id) with no business, no booking and no fact, bound to its database and run on
+ * the runtime side as rosie_job in a read-only transaction of its own on 1 connection, never on the gate's. Its answer is
+ * read for `phone.chatWay` alone (`chatWayOfTurnState`).
+ */
+export type TurnChatWayRead = (request: ReadTurnStateRequest) => Promise<ReadTurnStateOutcome>;
+
 /** What the real state-reads port is fed: each input, or null where none is bound, so each of its reads fails closed. */
 export interface StateReadInputs {
   readonly bundleSafety: BundleSafetyLines | null;
   readonly handleDirectory: HandleDirectory | null;
   readonly stoppedFlags: StoppedFlagRead | null;
   readonly turnDirectory: TurnDirectory | null;
+  /**
+   * The event turn's service read (T-1563). Null or left out where none is bound (staging until the task that binds it,
+   * production): the turn directory's `chatWayOf` answers null, so an event's turn runs nothing and the event is dropped
+   * (K-09 v1.14 open gap 214's default), never a guessed service.
+   */
+  readonly turnChatWay?: TurnChatWayRead | null;
+}
+
+/**
+ * The handle's phone service in K-05 v1.2 readTurnState's answer (`phone.chatWay`), or null for an error answer, no phone
+ * row, or a way that is no non-empty string. Nothing else of the answer is read or kept.
+ */
+export function chatWayOfTurnState(answer: unknown): string | null {
+  if (typeof answer !== "object" || answer === null || "error" in answer) return null;
+  const phone: unknown = (answer as { phone?: unknown }).phone;
+  if (typeof phone !== "object" || phone === null) return null;
+  const chatWay: unknown = (phone as { chatWay?: unknown }).chatWay;
+  return typeof chatWay === "string" && chatWay !== "" ? chatWay : null;
 }
 
 /** Every state read with none bound: each fails closed. */
@@ -1394,6 +1421,7 @@ function handleIdsOf(ids: HandleIds): HandleIds {
  */
 export function realStateReads(inputs: StateReadInputs): StateReads {
   const { bundleSafety, handleDirectory, stoppedFlags, turnDirectory } = inputs;
+  const turnChatWay = inputs.turnChatWay ?? null;
   const none = (read: string): Promise<never> => Promise.reject(new NoStateReadError(read));
   const noneNow = (read: string): never => {
     throw new NoStateReadError(read);
@@ -1421,6 +1449,17 @@ export function realStateReads(inputs: StateReadInputs): StateReads {
           if (turnDirectory === null) throw new NoStateReadError("partyOf");
           const party = await turnDirectory.partyOf(request);
           return party === null ? null : turnPartyOf(party);
+        },
+        // The event turn's service (T-1563): with no read bound, none, so the event's turn runs nothing.
+        async chatWayOf(request) {
+          if (turnChatWay === null) return null;
+          const answer = await turnChatWay({
+            handleId: request.handleId,
+            businessId: null,
+            bookingIds: [],
+            facts: [],
+          });
+          return chatWayOfTurnState(answer);
         },
       },
     },

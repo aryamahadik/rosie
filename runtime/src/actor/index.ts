@@ -27,6 +27,29 @@ export {
 } from "./copies";
 export type { InboxEntry } from "./inbox";
 export {
+  EVENT_ID_PREFIX,
+  EVENT_KIND,
+  EVENT_TABLE,
+  EventDoorRefusal,
+  eventIdOf,
+  handEvent,
+  inEventTable,
+  isEventEntry,
+  isEventIdForm,
+  openEventBody,
+  openEventFirsts,
+  sealEventFirsts,
+  type DoorEvent,
+  type EventBody,
+  type EventDoorStub,
+  type EventFirsts,
+  type EventInboxEntry,
+  type EventHandoff,
+  type EventKey,
+  type LeasedEntry,
+  type SealedEventHandoff,
+} from "./event-door";
+export {
   setBatchHooks,
   MAX_MS,
   MAX_TEXTS,

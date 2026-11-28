@@ -49,6 +49,7 @@
 // passedOn stands in); the team console (C-194).
 
 import type { CommitTurnRef, ParkAnswer, ParkingTurn } from "../actor";
+import { isEventEntry } from "../actor/event-door";
 import {
   actorNameOf,
   openWords,
@@ -321,7 +322,11 @@ async function stopMayBeIn(set: TurnDeps, turn: ParkingTurn): Promise<boolean> {
   if (turn.eventIds.some((eventId) => !stored.has(eventId))) return true;
   const keys = new Map<string, SealingKey>();
   try {
-    for (const { event } of turn.entries) {
+    for (const entry of turn.entries) {
+      // An event's entry holds no text (A18; K-09 v1.14 default 230): read as no text, never as unsure, so its turn's
+      // crash park carries the passedOn line to the owner (R36).
+      if (isEventEntry(entry)) continue;
+      const { event } = entry;
       let box: SealedWords | null = null;
       if (event.sealed !== null) {
         const name = actorNameOf(event.handle);

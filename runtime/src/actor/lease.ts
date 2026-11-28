@@ -81,6 +81,18 @@
 // (`beforeCommit`; QUESTIONS.md CQ-104 (f)'s default): while that queue still holds a danger or stop write the core is not
 // answering for, the commit is not sent (`transient`, nothing written), so no live turn's word lands before an older stop.
 //
+// An event's turn (T-1563; ruling T-1543 card A18; K-09 v1.14 defaults 221 to 233; ./event-door.ts): an event the actor's
+// door stored is queued here on its own (`queueEvent`: a lease_batches row of its own, its batch id the negative of its
+// inbox seq, so it never meets a batch window's id and the actor keeps no new table), never in a batch of texts, and runs
+// as a turn of its own: its
+// one entry, its turn id `turnIdOf([eventId])`, its trace the hand-off's own (entries[0].traceId), no joined trace. One
+// turn at a time per handle, in arrival order (the inbox's seq): an event waits behind a running turn, which it never
+// restarts, and the text batches that wait behind it wait for its turn to end, never restarting it. A running turn of
+// texts is restarted only by the text batches ahead of the first waiting event (the stop-word restart included), so a text
+// that came after an event never jumps it. An event turn ends as any turn (committed, with its reply; parked), or dropped
+// (`drop`: K-09 v1.14 `eventNotWaiting`, or no Linq service for the handle, defaults 230 and 214), which ends it with
+// nothing committed, so the waiting batches open the next turn and the known event id stays dropped at the door.
+//
 // Not here: what runs inside a turn (the guard and frontier, T-251; decide, gate and commit, T-252), joined through the
 // `runTurn` and `commit` hooks, and the park's request (T-253, ../turn/park.ts), joined through `park`. Unwired, no turn
 // runs and each closed batch stays stored with the batch window (fails closed); with no park wired, a third lapse is left
@@ -88,10 +100,11 @@
 // (the pin records the turn's `lease` span; the park, its own).
 
 import type { PinnedBundle, PinRequest, TurnPin } from "../bundle";
+import type { SealedBox } from "../gateway/seal";
 import type { OpenHold, SafetyResult } from "../safety";
 import type { BundleId, TraceContext } from "../trace";
 import { actorClock, createScheduleTable, scheduleEntry, unscheduleEntry, type ClosedBatch } from "./batch";
-import { readInboxEvents, type InboxEntry } from "./inbox";
+import { keepEventFirsts, readLeasedEntries, type LeasedEntry } from "./event-door";
 
 /** The lease's length: after it the turn reruns from its sealed texts (arch 01 line 61). */
 export const LEASE_MS = 60_000;
@@ -165,10 +178,11 @@ export type CommitTurnAnswer = CommitTurnCommitted | CommitTurnError;
  * - `unknownTurn`: the lease holds no such turn;
  * - `unwired`: no commit call is set yet (D-017); nothing was sent;
  * - `noAnswer`: the commit call failed with no answer, so the turn may have committed: send the same request again (one
- *   turn id commits once).
+ *   turn id commits once);
+ * - `dropped`: an event's turn the lease has dropped (A18: `drop`), which never commits.
  */
 export interface LeaseRefusal {
-  error: "replaced" | "parked" | "wrongTurn" | "unknownTurn" | "unwired" | "noAnswer";
+  error: "replaced" | "parked" | "wrongTurn" | "unknownTurn" | "unwired" | "noAnswer" | "dropped";
 }
 
 export type CommitAnswer = CommitTurnAnswer | LeaseRefusal;
@@ -182,10 +196,13 @@ function isCommitted(answer: CommitTurnAnswer): answer is CommitTurnCommitted {
 /** What a turn's work is handed: the turn, its sealed texts, and the bundle pinned for it. */
 export interface LeasedTurn {
   turnId: string;
-  /** The texts' event ids, in arrival order (K-05 turn.eventIds). */
+  /** The texts' event ids, in arrival order (K-05 turn.eventIds); an event turn's, its one event id (A18). */
   eventIds: string[];
-  /** The texts as the inbox keeps them, sealed, in arrival order: what the turn reads. */
-  entries: InboxEntry[];
+  /**
+   * The texts as the inbox keeps them, sealed, in arrival order: what the turn reads. An event turn's is its one event's
+   * entry (./event-door.ts `EventEntry`: its key, step and ref sealed; A18).
+   */
+  entries: LeasedEntry[];
   /** The first text's trace id, and the other texts' (CQ-06; K-05 turn.traceId and joinedTraceIds). */
   traceId: string;
   joinedTraceIds: string[];
@@ -241,6 +258,19 @@ export interface LeasedTurn {
    * never routine actions; a threat's never-released hold commits only protective changes. The commit is handed them again.
    */
   holds: OpenHold[];
+  /**
+   * An event turn's alone (A18; K-09 v1.14 default 222): keeps the first run's sealed service and zone on the event's entry,
+   * once, and answers the box kept first, so a rerun carries the first run's values. Synchronous, in the actor's storage;
+   * throws for an entry the inbox does not hold. Left out on a turn of texts.
+   */
+  keepEventFirsts?: (box: SealedBox) => SealedBox;
+  /**
+   * An event turn's alone (A18; K-09 v1.14 defaults 230 and 214): ends the turn with nothing committed (`eventNotWaiting`,
+   * or no Linq service for the handle), so the lease is released, the waiting batches open the next turn, and the turn is
+   * never run again. From a run no longer the turn's, or once the turn has committed or parked, it changes nothing. Left
+   * out on a turn of texts.
+   */
+  drop?: () => Promise<void>;
 }
 
 /** What the commit hook is handed beside the request, read at commit time (after the lease's own gate). */
@@ -270,7 +300,8 @@ export interface ParkingTurn {
   turnId: string;
   /** The texts' event ids, in arrival order (K-05 turn.eventIds). */
   eventIds: string[];
-  entries: InboxEntry[];
+  /** The texts' entries, sealed; an event turn's one event entry (A18), which holds no text. */
+  entries: LeasedEntry[];
   /** The first text's trace id, and the other texts' (CQ-06). */
   traceId: string;
   joinedTraceIds: string[];
@@ -360,9 +391,9 @@ export function setLeaseHooks(next: LeaseHooks): () => void {
 /**
  * leased: running. committing: a commit was sent (sticky: it may have gone through). committed: final, though while it
  * still holds the lease its run's reply has not ended (T-253). parking: its third lapse came with no commit, and the park
- * is under way (T-253). replaced and parked are final.
+ * is under way (T-253). replaced and parked are final; so is dropped, an event's turn ended with nothing committed (A18).
  */
-export type TurnState = "leased" | "committing" | "committed" | "replaced" | "parking" | "parked";
+export type TurnState = "leased" | "committing" | "committed" | "replaced" | "parking" | "parked" | "dropped";
 
 /** One turn as a reader sees it. */
 export interface TurnEntry {
@@ -381,7 +412,12 @@ export interface TurnEntry {
 interface Item {
   seq: number;
   eventId: string;
+  /** True for an event's (A18): it is a turn of its own, never batched with texts. */
+  event?: true;
 }
+
+/** True for the items of an event's turn (A18): its one item is an event's. */
+const isEventTurn = (items: readonly Item[]): boolean => items.some((item) => item.event === true);
 
 interface TurnRow extends Record<string, SqlStorageValue> {
   /** The order the turn opened in (AUTOINCREMENT: never reused, never reordered). */
@@ -447,6 +483,30 @@ export function createLeaseTables(sql: SqlStorage): void {
   createScheduleTable(sql);
 }
 
+/**
+ * An event's row in lease_batches (A18): its batch id the negative of its inbox seq. A batch window's ids start at 1 and
+ * rise (batch.ts, AUTOINCREMENT), and an inbox seq is never reused, so the two never meet.
+ */
+const eventBatchIdOf = (seq: number): number => -seq;
+
+/** One waiting unit: a closed batch of texts, or an event, which is a turn of its own (A18). */
+interface Waiting {
+  batchId: number;
+  items: Item[];
+}
+
+const firstSeqOf = (unit: Waiting): number => unit.items[0]?.seq ?? 0;
+
+/** The waiting batches of texts ahead of the first waiting event, in order: those a turn of texts may take (A18). */
+function leadingBatches(waiting: readonly Waiting[]): Waiting[] {
+  const batches: Waiting[] = [];
+  for (const unit of waiting) {
+    if (isEventTurn(unit.items)) break;
+    batches.push(unit);
+  }
+  return batches;
+}
+
 /** What `advance` decided from, compared again inside its transaction. */
 interface Snapshot {
   lease: {
@@ -457,20 +517,26 @@ interface Snapshot {
     tries: number;
     items: Item[];
   } | null;
-  waiting: { batchId: number; items: Item[] }[];
+  /** The waiting batches and events, in arrival order (each one's first seq). */
+  waiting: Waiting[];
   /**
-   * True when a waiting batch may hold a stop word (the host's `stopAmong`, ADR-018 section 1). Asked only while a leased
-   * turn that has used its one restart holds the lease and batches wait; false otherwise.
+   * True when a waiting batch ahead of the first waiting event may hold a stop word (the host's `stopAmong`, ADR-018
+   * section 1). Asked only while a leased turn of texts that has used its one restart holds the lease and such batches
+   * wait; false otherwise.
    */
   stopWaiting: boolean;
 }
 
-/** What the waiting batches do: open a turn (`replaces` null, restart 0) or replace the running one (restart 1 or 2). */
+/**
+ * What the waiting units do: open a turn (`replaces` null, restart 0) or replace the running one (restart 1 or 2), with
+ * the units it takes (`batchIds`: batches of texts, or one event's row, A18).
+ */
 interface Plan {
   items: Item[];
   replaces: string | null;
   /** What lease_turns.restart is written as for the turn the plan opens. */
   restart: 0 | 1 | 2;
+  batchIds: number[];
 }
 
 export interface LeaseHost {
@@ -592,9 +658,33 @@ export class TurnLease {
   }
 
   /**
+   * Queues an event the actor's door has just stored (A18) for a turn of its own, by its inbox seq, inside the caller's
+   * storage transaction (the door's write and this are one step): once, as a lease_batches row of its own whose batch id
+   * is the negative of that seq (`eventBatchIdOf`) and whose one item is the event's. Its turn opens with `kick`.
+   */
+  queueEvent(seq: number, eventId: string): void {
+    const item: Item = { seq, eventId, event: true };
+    this.sql.exec(
+      "INSERT OR IGNORE INTO lease_batches (batch_id, items, turn_id, seen_ms) VALUES (?, ?, NULL, ?)",
+      eventBatchIdOf(seq),
+      JSON.stringify([item]),
+      actorClock().now(),
+    );
+    this.syncSchedule();
+  }
+
+  /** Gives what waits its turn now (a queued event among them), then sets the alarm from the stored schedule. */
+  async kick(): Promise<void> {
+    await this.advance();
+    await this.host.arm();
+  }
+
+  /**
    * Gives the waiting batches a turn: with no lease held, they open the next turn; with a running turn that has not
    * restarted and has not begun its commit, they restart it once with its texts and theirs; with one that has used that
    * restart, they restart it a second time when one of them may hold a stop word (ADR-018 section 1); otherwise they wait.
+   * An event (A18) opens a turn of its own when it is first in line and no lease is held, and otherwise waits; only the
+   * batches ahead of the first waiting event open or restart a turn of texts.
    * The turn id is hashed outside the transaction (WebCrypto is asynchronous), so the transaction decides again from what
    * is stored now, the host's `stopAmong` asked again, and writes only when it decides the same; otherwise it starts over.
    */
@@ -619,7 +709,11 @@ export class TurnLease {
           plan.restart,
           at,
         );
-        this.sql.exec("UPDATE lease_batches SET turn_id = ? WHERE turn_id IS NULL", turnId);
+        this.sql.exec(
+          "UPDATE lease_batches SET turn_id = ? WHERE turn_id IS NULL AND batch_id IN (SELECT value FROM json_each(?))",
+          turnId,
+          JSON.stringify(plan.batchIds),
+        );
         if (plan.replaces === null) {
           // The table's one row: a second lease cannot be written beside a held one (the insert would fail).
           this.sql.exec(
@@ -649,13 +743,20 @@ export class TurnLease {
   private snapshot(): Snapshot {
     const lease = this.leaseRow();
     const turn = lease === undefined ? undefined : this.turnRow(lease.turn_id);
+    // In arrival order: a batch by its first text's seq, an event by its own (A18). Without events this is batch order.
     const waiting = this.sql
       .exec<WaitingRow>("SELECT batch_id, items FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id")
       .toArray()
-      .map((row) => ({ batchId: row.batch_id, items: JSON.parse(row.items) as Item[] }));
-    // Only a leased turn that has used its one restart can take the second: the host is asked only while such a turn holds
-    // the lease and batches wait (planOf still leaves one that is left for the park).
-    const asks = turn?.state === "leased" && turn.restart === 1 && waiting.length > 0;
+      .map((row): Waiting => ({ batchId: row.batch_id, items: JSON.parse(row.items) as Item[] }))
+      .sort((a, b) => firstSeqOf(a) - firstSeqOf(b));
+    const leading = leadingBatches(waiting);
+    // Only a leased turn of texts that has used its one restart can take the second: the host is asked only while such a
+    // turn holds the lease and batches wait ahead of any event (planOf still leaves one that is left for the park).
+    const asks =
+      turn?.state === "leased" &&
+      turn.restart === 1 &&
+      leading.length > 0 &&
+      !isEventTurn(JSON.parse(turn.items) as Item[]);
     return {
       lease:
         lease === undefined || turn === undefined
@@ -670,7 +771,7 @@ export class TurnLease {
             },
       waiting,
       stopWaiting:
-        asks && this.stopAmong(bySeq(waiting.flatMap((batch) => batch.items)).map((item) => item.eventId)),
+        asks && this.stopAmong(bySeq(leading.flatMap((batch) => batch.items)).map((item) => item.eventId)),
     };
   }
 
@@ -700,8 +801,11 @@ export class TurnLease {
     const lease = this.leaseRow();
     const turn = this.turnRow(turnId);
     if (runTurn === undefined || lease?.turn_id !== turnId || turn === undefined) return;
-    const eventIds = (JSON.parse(turn.items) as Item[]).map((item) => item.eventId);
-    const entries = readInboxEvents(this.sql, eventIds);
+    const items = JSON.parse(turn.items) as Item[];
+    const eventIds = items.map((item) => item.eventId);
+    const entries = readLeasedEntries(this.sql, eventIds);
+    // An event's turn (A18): its first run's service and zone kept on its entry, and its end with nothing committed.
+    const event = isEventTurn(items) ? (eventIds[0] ?? null) : null;
     const traceId = entries[0]?.traceId ?? "";
     const joinedTraceIds = [...new Set(entries.slice(1).map((entry) => entry.traceId))].filter(
       (id) => id !== traceId,
@@ -724,6 +828,12 @@ export class TurnLease {
       commit: (request, options) => this.commit(turnId, request, options?.reply === true),
       replied: () => this.replied(turnId, controller),
       resultsOf: (asked) => this.resultsOf(eventIds, asked),
+      ...(event === null
+        ? {}
+        : {
+            keepEventFirsts: (box: SealedBox) => keepEventFirsts(this.sql, event, box),
+            drop: () => this.drop(turnId, controller),
+          }),
     };
     const pinRequest: PinRequest = {
       turnId,
@@ -802,6 +912,7 @@ export class TurnLease {
       if (turn === undefined) return { error: "unknownTurn" };
       if (turn.state === "replaced") return { error: "replaced" };
       if (turn.state === "parked" || turn.state === "parking") return { error: "parked" };
+      if (turn.state === "dropped") return { error: "dropped" };
       if (turn.state === "leased") {
         this.sql.exec("UPDATE lease_turns SET state = 'committing' WHERE turn_id = ?", turnId);
       }
@@ -858,7 +969,15 @@ export class TurnLease {
     this.host.storage.transactionSync(() => {
       const turn = this.turnRow(turnId);
       const state = turn?.state;
-      if (state === undefined || state === "committed" || state === "parked" || state === "replaced") return;
+      if (
+        state === undefined ||
+        state === "committed" ||
+        state === "parked" ||
+        state === "replaced" ||
+        state === "dropped"
+      ) {
+        return;
+      }
       this.sql.exec(
         "UPDATE lease_turns SET state = 'committed', committed_at = ? WHERE turn_id = ?",
         committedAt,
@@ -903,12 +1022,19 @@ export class TurnLease {
    */
   private async finish(
     turnId: string,
-    state: "committed" | "parked",
+    state: "committed" | "parked" | "dropped",
     committedAt: string | null,
   ): Promise<void> {
     this.host.storage.transactionSync(() => {
       const turn = this.turnRow(turnId);
-      if (turn === undefined || turn.state === "committed" || turn.state === "parked") return;
+      if (
+        turn === undefined ||
+        turn.state === "committed" ||
+        turn.state === "parked" ||
+        turn.state === "dropped"
+      ) {
+        return;
+      }
       this.sql.exec(
         "UPDATE lease_turns SET state = ?, committed_at = ? WHERE turn_id = ?",
         state,
@@ -922,6 +1048,19 @@ export class TurnLease {
     this.runs.delete(turnId);
     await this.advance();
     await this.host.arm();
+  }
+
+  /**
+   * An event turn's run ends it with nothing committed (A18; K-09 v1.14 defaults 230 and 214): the turn is dropped, the
+   * lease released and the waiting batches open the next turn. Only the run that has the turn now is heard, and only while
+   * the turn is leased or committing (a commit it sent was answered with nothing written); never once it committed, parked
+   * or is being parked.
+   */
+  private async drop(turnId: string, run: AbortController): Promise<void> {
+    if (this.runs.get(turnId) !== run) return;
+    const state = this.turnRow(turnId)?.state;
+    if (state !== "leased" && state !== "committing") return;
+    await this.finish(turnId, "dropped", null);
   }
 
   // ---- the lapse ------------------------------------------------------------------------------------------------------
@@ -1061,7 +1200,7 @@ export class TurnLease {
     if (park === undefined || turn?.state !== "parking") return;
     this.stop(turnId);
     const eventIds = (JSON.parse(turn.items) as Item[]).map((item) => item.eventId);
-    const entries = readInboxEvents(this.sql, eventIds);
+    const entries = readLeasedEntries(this.sql, eventIds);
     const traceId = entries[0]?.traceId ?? "";
     const joinedTraceIds = [...new Set(entries.slice(1).map((entry) => entry.traceId))].filter(
       (id) => id !== traceId,
@@ -1183,7 +1322,8 @@ export class TurnLease {
 
   /**
    * The event ids, in arrival order, of the texts the lease has that no commit has taken yet (T-270): those of a turn
-   * leased, committing or being parked, and of the batches waiting for the next turn.
+   * leased, committing or being parked, and of the batches waiting for the next turn. An event the lease has (A18) is
+   * among them the same way, though it holds no text: a reader that weighs texts finds it no text the safety read reads.
    */
   pendingEventIds(): string[] {
     const items: Item[] = [];
@@ -1199,11 +1339,11 @@ export class TurnLease {
     return [...new Set(bySeq(items).map((item) => item.eventId))];
   }
 
-  /** The batch ids that wait for the next turn, in order. */
+  /** The batch ids that wait for the next turn, in order (a batch window's; an event waiting is no batch: A18). */
   waiting(): number[] {
     return this.sql
       .exec<{ batch_id: number }>(
-        "SELECT batch_id FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id",
+        "SELECT batch_id FROM lease_batches WHERE turn_id IS NULL AND batch_id > 0 ORDER BY batch_id",
       )
       .toArray()
       .map((row) => row.batch_id);
@@ -1239,15 +1379,25 @@ function lapseOf(turn: TurnRow): Lapse | null {
  * a turn that has begun its commit, is replying (T-253), is being parked or is left for the park keeps them waiting, and
  * so do a turn that has used its one restart while none of them may hold a stop word and a turn opened by the second
  * restart, which is never restarted again.
+ *
+ * Events (A18): an event first in line with no lease held opens a turn of its own; otherwise it waits. Only the batches
+ * ahead of the first waiting event open or restart a turn of texts, so a batch behind an event waits for the event's
+ * turn; a running event turn is never restarted.
  */
 function planOf(state: Snapshot, now: number): Plan | null {
-  if (state.waiting.length === 0) return null;
-  const waitingItems = state.waiting.flatMap((batch) => batch.items);
+  const first = state.waiting[0];
+  if (first === undefined) return null;
   const live = state.lease;
-  if (live === null) return { items: bySeq(waitingItems), replaces: null, restart: 0 };
+  if (live === null && isEventTurn(first.items)) {
+    return { items: [...first.items], replaces: null, restart: 0, batchIds: [first.batchId] };
+  }
+  const leading = leadingBatches(state.waiting);
+  const waitingItems = leading.flatMap((batch) => batch.items);
+  const batchIds = leading.map((batch) => batch.batchId);
+  if (live === null) return { items: bySeq(waitingItems), replaces: null, restart: 0, batchIds };
   const stuck = live.tries >= MAX_TRIES && live.untilMs <= now;
-  if (live.state !== "leased" || stuck) return null;
+  if (live.state !== "leased" || stuck || isEventTurn(live.items) || leading.length === 0) return null;
   const restart = live.restart === 0 ? 1 : live.restart === 1 && state.stopWaiting ? 2 : null;
   if (restart === null) return null;
-  return { items: bySeq([...live.items, ...waitingItems]), replaces: live.turnId, restart };
+  return { items: bySeq([...live.items, ...waitingItems]), replaces: live.turnId, restart, batchIds };
 }

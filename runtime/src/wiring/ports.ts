@@ -194,7 +194,12 @@ export type FrontierPort = Pick<TurnFace, "buildFrontier">;
  * the turn's pinned bundle, its K-05 commitTurn through the turn-row port. The request comes with the service and Linq
  * chat id of the turn's last text on its turn (K-09 v1.5 default 135: the root copies them from that text's K-06 event).
  * The turn records the gate (one span per part, with its limits) and the commit itself, and the Tool API base records
- * neither (TURN_RECORDS_GATE; DL-376), so no flag is set for this hop.
+ * neither (TURN_RECORDS_GATE; DL-376), so no flag is set for this hop. An event's turn (T-1563; K-09 v1.14 default 221)
+ * sends input event with the handle's phone service and the directory's zone on its input, and neither a service nor a
+ * chat id on its turn: its entry carries no K-06 pair, so the root's copy puts none there. The real port checks the gate
+ * at K-09 v1.5 until A11 builds v1.14's event turn, so no event reaches it before then (no event is handed: v1.14 "Who
+ * reads v1.14"); compose input for an event turn's rows holds no inbound text, its request holding no decided texts
+ * (default 231).
  */
 export type GatePort = Pick<TurnFace, "gateAndCommit">;
 
