@@ -1,0 +1,360 @@
+{
+  "context": {
+    "turnId": "turn-s1-13-sam-edits",
+    "bundleId": {
+      "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "build": 1
+    },
+    "flow": "A",
+    "texts": [
+      {
+        "eventId": "evt-sam-0113",
+        "kind": "text",
+        "words": "K paid when they book. A at their home too, 75, paid when they book",
+        "sentAt": { "utc": "2026-10-19T15:02:00Z", "zone": "America/New_York" },
+        "attachments": [],
+        "poll": null,
+        "tapback": null
+      }
+    ],
+    "writer": {
+      "handle": "+15555550100",
+      "people": [
+        {
+          "personId": "person-sam",
+          "name": "Sam Lee",
+          "roles": [{ "role": "owner", "businessId": "biz-lees-barbershop" }],
+          "language": "en"
+        }
+      ]
+    },
+    "businessLanguage": "en",
+    "openQuestions": [
+      {
+        "openQuestionId": "oq-s1-13",
+        "step": "S1-13",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "sentAt": { "utc": "2026-10-19T15:00:00Z", "zone": "America/New_York" },
+        "pollId": null,
+        "askCount": 1
+      }
+    ],
+    "choices": [
+      {
+        "choiceId": "c-01",
+        "kind": "option",
+        "label": "Right for all of them",
+        "definition": "One card lists each service as read, with its price, where, what's taken when they book, and how it's paid after.",
+        "step": "S1-13",
+        "question": "oq-s1-13",
+        "branch": "Right for all of them",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": []
+      },
+      {
+        "choiceId": "c-02",
+        "kind": "option",
+        "label": "No money through us",
+        "definition": "'No money through Rosie' is one answer here.",
+        "step": "S1-13",
+        "question": "oq-s1-13",
+        "branch": "No money through us",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": []
+      },
+      {
+        "choiceId": "oq-s1-13",
+        "kind": "option",
+        "label": "What's different, by letter",
+        "definition": "Each service starts from the plug-in's answer, so Sam sends only what's different.",
+        "step": "S1-13",
+        "question": "oq-s1-13",
+        "branch": "What's different, by letter",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [
+          { "name": "edit.1.letter", "type": "text" },
+          { "name": "edit.1.place", "type": "text" },
+          { "name": "edit.1.before", "type": "text" },
+          { "name": "edit.1.amount", "type": "money" },
+          { "name": "edit.1.after", "type": "text" },
+          { "name": "edit.2.letter", "type": "text" },
+          { "name": "edit.2.place", "type": "text" },
+          { "name": "edit.2.before", "type": "text" },
+          { "name": "edit.2.amount", "type": "money" },
+          { "name": "edit.2.after", "type": "text" },
+          { "name": "edit.3.letter", "type": "text" },
+          { "name": "edit.3.place", "type": "text" },
+          { "name": "edit.3.before", "type": "text" },
+          { "name": "edit.3.amount", "type": "money" },
+          { "name": "edit.3.after", "type": "text" },
+          { "name": "edit.4.letter", "type": "text" },
+          { "name": "edit.4.place", "type": "text" },
+          { "name": "edit.4.before", "type": "text" },
+          { "name": "edit.4.amount", "type": "money" },
+          { "name": "edit.4.after", "type": "text" },
+          { "name": "edit.5.letter", "type": "text" },
+          { "name": "edit.5.place", "type": "text" },
+          { "name": "edit.5.before", "type": "text" },
+          { "name": "edit.5.amount", "type": "money" },
+          { "name": "edit.5.after", "type": "text" },
+          { "name": "edit.6.letter", "type": "text" },
+          { "name": "edit.6.place", "type": "text" },
+          { "name": "edit.6.before", "type": "text" },
+          { "name": "edit.6.amount", "type": "money" },
+          { "name": "edit.6.after", "type": "text" },
+          { "name": "edit.7.letter", "type": "text" },
+          { "name": "edit.7.place", "type": "text" },
+          { "name": "edit.7.before", "type": "text" },
+          { "name": "edit.7.amount", "type": "money" },
+          { "name": "edit.7.after", "type": "text" },
+          { "name": "edit.8.letter", "type": "text" },
+          { "name": "edit.8.place", "type": "text" },
+          { "name": "edit.8.before", "type": "text" },
+          { "name": "edit.8.amount", "type": "money" },
+          { "name": "edit.8.after", "type": "text" },
+          { "name": "edit.9.letter", "type": "text" },
+          { "name": "edit.9.place", "type": "text" },
+          { "name": "edit.9.before", "type": "text" },
+          { "name": "edit.9.amount", "type": "money" },
+          { "name": "edit.9.after", "type": "text" },
+          { "name": "edit.10.letter", "type": "text" },
+          { "name": "edit.10.place", "type": "text" },
+          { "name": "edit.10.before", "type": "text" },
+          { "name": "edit.10.amount", "type": "money" },
+          { "name": "edit.10.after", "type": "text" }
+        ],
+        "stakes": "low",
+        "stakesFrom": []
+      },
+      {
+        "choiceId": "c-03",
+        "kind": "anytime",
+        "label": "Danger or crisis",
+        "definition": "Every message and every call is checked before any answer, every time, by meaning.",
+        "step": "A3-22",
+        "question": null,
+        "branch": null,
+        "anytimeRow": "danger-or-crisis",
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": []
+      }
+    ],
+    "cards": [],
+    "facts": [
+      {
+        "name": "card.a",
+        "value": "Haircut",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-haircut",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.b",
+        "value": "Skin fade",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-skin-fade",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.c",
+        "value": "Beard trim",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-beard-trim",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.d",
+        "value": "Kids cut",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-kids-cut",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.e",
+        "value": "Signature cut and shave",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-cut-and-shave",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.f",
+        "value": "Groom's package",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-grooms-package",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.g",
+        "value": "Color and cut",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-color-and-cut",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.h",
+        "value": "Color correction",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-color-correction",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      },
+      {
+        "name": "card.i",
+        "value": "Style consult",
+        "home": "money",
+        "table": "services",
+        "rowId": "svc-lees-style-consult",
+        "version": 1,
+        "forSteps": ["S1-13"]
+      }
+    ],
+    "alwaysOn": {
+      "flow": "A",
+      "prefixSha256": "18d7f9c761c1f58436d2e3e9148b64386221b1d0affa33a8c7b0226c06b6ebea"
+    },
+    "recentMessages": [
+      {
+        "from": "rosie",
+        "sentAt": { "utc": "2026-10-19T15:00:00Z", "zone": "America/New_York" },
+        "words": "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter. / Every service, to start / At your shop, paid at the chair, your own way / When they book: a card saved, for a $20 fee you OK / Free on your board: nothing taken, nothing after / House calls: allowed where you are, for those cleared / A) Haircut · $35 / B) Skin fade · $40 / C) Beard trim · $20 / D) Kids cut · $25 / E) Signature cut and shave · $55 / F) Groom's package · $140 / G) Color and cut · From photos / H) Color correction · At the chair / I) Style consult · Free / Reply 1 Right for all of them, 2 No money through us."
+      }
+    ],
+    "meaningSearch": null
+  },
+  "decide": {
+    "turnId": "turn-s1-13-sam-edits",
+    "bundleId": {
+      "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "build": 1
+    },
+    "stakes": "low",
+    "routing": { "first": "haiku", "second": "haiku" },
+    "reads": [
+      {
+        "model": "haiku",
+        "role": "first",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "K paid when they book. A at their home too, 75, paid when they book",
+              "question": "oq-s1-13",
+              "choice": "oq-s1-13",
+              "fields": [
+                { "name": "edit.1.letter", "value": "K", "words": "K" },
+                { "name": "edit.1.before", "value": "paid when they book", "words": "paid when they book" },
+                { "name": "edit.2.letter", "value": "A", "words": "A" },
+                { "name": "edit.2.place", "value": "at their home", "words": "at their home" },
+                { "name": "edit.2.before", "value": "paid when they book", "words": "paid when they book" },
+                { "name": "edit.2.amount", "value": { "cents": 7500, "currency": "USD" }, "words": "75" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "model": "haiku",
+        "role": "check",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "K paid when they book. A at their home too, 75, paid when they book",
+              "question": "oq-s1-13",
+              "choice": "oq-s1-13",
+              "fields": [
+                { "name": "edit.1.letter", "value": "K", "words": "K" },
+                { "name": "edit.1.before", "value": "paid when they book", "words": "paid when they book" },
+                { "name": "edit.2.letter", "value": "A", "words": "A" },
+                { "name": "edit.2.place", "value": "at their home", "words": "at their home" },
+                { "name": "edit.2.before", "value": "paid when they book", "words": "paid when they book" },
+                { "name": "edit.2.amount", "value": { "cents": 7500, "currency": "USD" }, "words": "75" }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "agreed": true,
+    "reread": false,
+    "language": "en",
+    "parts": [
+      {
+        "part": {
+          "verb": "choose",
+          "quote": "K paid when they book. A at their home too, 75, paid when they book",
+          "question": "oq-s1-13",
+          "choice": "oq-s1-13",
+          "fields": [
+            { "name": "edit.1.letter", "value": "K", "words": "K" },
+            { "name": "edit.1.before", "value": "paid when they book", "words": "paid when they book" },
+            { "name": "edit.2.letter", "value": "A", "words": "A" },
+            { "name": "edit.2.place", "value": "at their home", "words": "at their home" },
+            { "name": "edit.2.before", "value": "paid when they book", "words": "paid when they book" },
+            { "name": "edit.2.amount", "value": { "cents": 7500, "currency": "USD" }, "words": "75" }
+          ]
+        },
+        "outcome": "go"
+      }
+    ]
+  }
+}

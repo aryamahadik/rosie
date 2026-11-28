@@ -1218,10 +1218,18 @@ describe("the double's call log is the run's only transport, and every fixture i
   });
 
   it("every K-02 fixture (v1, v1.1 and v1.2) and every K-03 v1 fixture came out as its index says: each accepted one given or taken, but for those WAITING and NOT_A_STAGE name; each refused one refused", () => {
-    // K-02 v1.3's nine entries are left out by name, and nothing else is (RUN_VERSIONS).
+    // K-02 v1.3's nine entries and v1.4's five (T-1546, typed price lines, edits by letter and rule edits, which no
+    // stage here reads yet) are left out by name, and nothing else is (RUN_VERSIONS).
+    const leftOutV1dot4 = [
+      "pair-s1-12-typed-lines.json",
+      "pair-s1-13-edits-by-letter.json",
+      "pair-s1-21-rule-edit.json",
+      "invalid/refuse-typed-amount-not-in-words.json",
+      "invalid/refuse-edit-unknown-letter.json",
+    ];
     const leftOut = model.fixtures.entries.filter((entry) => !RUN_VERSIONS.includes(entry.version));
-    expect(sorted(leftOut.map((entry) => entry.file))).toEqual(sorted(LEFT_OUT_V1_3));
-    expect(new Set(leftOut.map((entry) => entry.version))).toEqual(new Set(["v1.3"]));
+    expect(sorted(leftOut.map((entry) => entry.file))).toEqual(sorted([...LEFT_OUT_V1_3, ...leftOutV1dot4]));
+    expect(new Set(leftOut.map((entry) => entry.version))).toEqual(new Set(["v1.3", "v1.4"]));
     const k02 = model.fixtures.entries
       .filter((entry) => RUN_VERSIONS.includes(entry.version))
       .map((entry) => ({

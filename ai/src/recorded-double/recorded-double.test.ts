@@ -602,8 +602,9 @@ describe("turn 1 (K-02 v1.1): the recordings the README names, every context pin
     // K-02 v1.2 (T-1157, an unmapped turn's end) is frozen beside them; it changes no model-facing definition, so the
     // double keeps reading v1 and v1.1 (contracts/model/README.md "v1.2", "Who reads v1.2"). K-02 v1.3 (T-070, photo
     // reading) is frozen too; it changes no turn's definition and the double holds no photo-reading recording yet
-    // (contracts/model/README.md "v1.3"), so it reads neither.
-    expect(frozen.frozen).toEqual([...MODEL_VERSIONS, "v1.2", "v1.3"]);
+    // (contracts/model/README.md "v1.3"), so it reads neither. K-02 v1.4 (T-1546, typed fields) is frozen too; it
+    // changes no model-facing definition (contracts/model/README.md "v1.4"), so the double reads it neither.
+    expect(frozen.frozen).toEqual([...MODEL_VERSIONS, "v1.2", "v1.3", "v1.4"]);
     // K-02's context fixtures by version: v1's two and v1.1's turn 1; no other version holds one.
     expect(acceptedOf("context", "v1")).toEqual(["context-s1-02.json", "context-two-requests.json"]);
     expect(acceptedOf("context", "v1.1")).toEqual(["context-s1-01.json"]);
