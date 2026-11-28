@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 944, [`d0766cb2`](https://github.com/aryamahadik/rosie/commit/d0766cb2), 2026-11-26 14:49:52 UTC.
+- **Through:** commit 946, [`250bdddb`](https://github.com/aryamahadik/rosie/commit/250bdddb), 2026-11-26 19:11:22 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 946. docs: COMMIT\_HISTORY.md through commit 944 (d0766cb2, \#962) (\#964)
+
+- **Commit:** [`250bdddb`](https://github.com/aryamahadik/rosie/commit/250bdddb), by Arya Mahadik, 2026-11-26 19:11:22 UTC
+- **Pull request:** [#964](https://github.com/aryamahadik/rosie/pull/964) from `task/commit-history-249`, merged 2026-11-26 19:11:22 UTC. It squashed 1 branch commit:
+  - `518f960` docs: COMMIT\_HISTORY.md through commit 944 (d0766cb2, \#962)
+- **Files changed:** 1 (+106 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +106 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 945. T-1550: contract tests for K-05 v1.23 (schema side and database side through db/repo parkTurn) and K-09 v1.13 (turnRefused labels only, notBuilt final, default 217 against the fault lists) (\#963)
+
+- **Commit:** [`12b6759c`](https://github.com/aryamahadik/rosie/commit/12b6759c), by Arya Mahadik, 2026-11-26 19:11:17 UTC
+- **Pull request:** [#963](https://github.com/aryamahadik/rosie/pull/963) from `task/T-1550`, merged 2026-11-26 19:11:18 UTC. It squashed 1 branch commit:
+  - `ede11d7` T-1550: contract tests for K-05 v1.23 (schema side and database side …
+- **Files changed:** 3 (+2575 −0), by folder:
+  - `tests/contract/` data-access.v1.23.db-side.test.ts +760 −0, data-access.v1.23.test.ts +1018 −0, tool-api.v1.13.test.ts +797 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 944. docs: COMMIT\_HISTORY.md through commit 939 (11032c16, \#957) (\#962)
 
